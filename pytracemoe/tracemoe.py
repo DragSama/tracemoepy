@@ -1,7 +1,7 @@
 from base64 import b64encode
 from requests import Session
 
-class tracemoe:
+class TraceMoe:
     """Tracemoe class with all the stuff"""
     def __init__(self, api_token:str=""):
         self.base_url = "https://trace.moe/"
