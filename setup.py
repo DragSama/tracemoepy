@@ -11,6 +11,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/DragSama/pytracemoe",
+    download_url = 'https://github.com/DragSama/pytracemoe/archive/v0.1.tar.gz'
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
