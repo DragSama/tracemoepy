@@ -2,7 +2,8 @@ from base64 import b64encode
 from requests import Session
 
 class tracemoe:
-    def __init__(self, api_token=""):
+    """Tracemoe class with all the stuff"""
+    def __init__(self, api_token:str=""):
         self.base_url = "https://trace.moe/"
         self.media_url = "https://media.trace.moe/"
         self.api_token = api_token
@@ -11,7 +12,15 @@ class tracemoe:
             "Content-Type": "application/json"
         }
     
-    def search(self, path, encode=True, is_url=False):
+    def search(self, path:str, encode:bool=True, is_url:bool=False) -> dict:
+        """
+        Args:
+           path: Image url or Img file name or base64 encoded Image
+           encode: True if Img file name is given
+           is_url: Treat the path as a url or not
+        Returns:
+           json response
+        """
         url = f"{self.base_url}/api/search"
         if self.api_token:
             url += f"?token={self.api_token}"
