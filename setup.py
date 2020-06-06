@@ -6,12 +6,12 @@ with open("README.md", "r") as fh:
 setuptools.setup(
     name="pytracemoe",
     packagaes = ['pytracemoe'],
-    version="0.1",
+    version="0.2",
     description="Trace.moe python wrapper",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/DragSama/pytracemoe",
-    download_url = 'https://github.com/DragSama/pytracemoe/archive/v0.1.tar.gz',
+    download_url = 'https://github.com/DragSama/pytracemoe/archive/v0.2.tar.gz',
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
