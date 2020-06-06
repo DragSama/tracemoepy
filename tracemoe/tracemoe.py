@@ -41,7 +41,15 @@ class tracemoe:
                 url, json={"image": encoded}
                 ).json()
     
-    def create_preview(self, json, index = 0, path):
+    def create_preview(self, json:dict, index:int = 0, path:str):
+        """
+        Args:
+           json: Dict gives by search
+           index: Which result to get
+           path: Path to use, preview.php, thumbnail.php etc.
+        Returns:
+           image content
+        """
         json = json["docs"][index]
         url = f"{self.base_url}/{path}?anilist_id={json['anilist_id']}"\
               f"&file={json['file_name']}&t={json['at']}&token]{json['tokenthumb']}"
