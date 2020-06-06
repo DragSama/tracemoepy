@@ -1,1 +1,1 @@
-from pytracemoe import TraceMoe
+from pytracemoe.tracemoe import TraceMoe
