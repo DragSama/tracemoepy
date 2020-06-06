@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="DragSama", # Replace with your own username
-    version="0.0.1",
+    version="0.1",
     author="DragSama",
     description="Trace.moe python wrapper",
     long_description=long_description,
