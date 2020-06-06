@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="pytracemoe",
-    packagaes = ['pytracemoe']
+    packagaes = ['pytracemoe'],
     version="0.1",
     description="Trace.moe python wrapper",
     long_description=long_description,
