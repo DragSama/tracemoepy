@@ -32,7 +32,7 @@ class tracemoe:
                 url, json={"image": encoded}
                 ).json()
     
-    def create_preview(self, json, index = 0, path)
+    def create_preview(self, json, index = 0, path):
         json = json["docs"][index]
         url = f"{self.base_url}/{path}?anilist_id={json['anilist_id']}"\
               f"&file={json['file_name']}&t={json['at']}&token]{json['tokenthumb']}"
