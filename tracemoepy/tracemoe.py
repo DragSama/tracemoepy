@@ -41,7 +41,7 @@ class TraceMoe:
                 url, json={"image": encoded}
                 ).json()
     
-    def create_preview(self, json:dict, index:int = 0, path:str):
+    def create_preview(self, json:dict, path:str, index:int = 0,):
         """
         Args:
            json: Dict gives by search
@@ -53,7 +53,7 @@ class TraceMoe:
         json = json["docs"][index]
         url = f"{self.base_url}/{path}?anilist_id={json['anilist_id']}"\
               f"&file={json['file_name']}&t={json['at']}&token]{json['tokenthumb']}"
-        return self.session.get(url).content
+        return self.r_session.get(url).content
     
     def video_preview(self, json, index = 0):
         return self.create_preview(json, index, 'preview.php')
