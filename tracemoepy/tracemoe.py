@@ -56,7 +56,7 @@ class TraceMoe:
         return self.r_session.get(url).content
     
     def video_preview(self, json, index = 0):
-        return self.create_preview(json, index, 'preview.php')
+        return self.create_preview(json, 'preview.php', index)
         
         
         
