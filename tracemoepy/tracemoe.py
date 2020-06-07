@@ -51,7 +51,7 @@ class TraceMoe:
            Image content
         """
         json = json["docs"][index]
-        url = f"{self.base_url}/{path}?anilist_id={json['anilist_id']}"\
+        url = f"{self.media_url}/{path}?anilist_id={json['anilist_id']}"\
               f"&file={json['filename']}&t={json['at']}&token]{json['tokenthumb']}"
         return self.r_session.get(url).content
     
