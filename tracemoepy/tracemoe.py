@@ -21,7 +21,7 @@ class TraceMoe:
         Returns:
            json response
         """
-        url = f"{self.base_url}/api/search"
+        url = f"{self.base_url}api/search"
         if self.api_token:
             url += f"?token={self.api_token}"
 
@@ -51,8 +51,9 @@ class TraceMoe:
            Image content
         """
         json = json["docs"][index]
-        url = f"{self.media_url}/{path}?anilist_id={json['anilist_id']}"\
-              f"&file={json['filename']}&t={json['at']}&token]{json['tokenthumb']}"
+        url = f"{self.base_url}{path}?anilist_id={json['anilist_id']}"\
+              f"&file={json['filename']}&t={json['at']}&token={json['tokenthumb']}"
+        print(url)
         return self.r_session.get(url).content
     
     def video_preview(self, json:dict, index:int = 0) -> bytes:
@@ -64,6 +65,5 @@ class TraceMoe:
            Image content
         """
         return self.create_preview(json, 'preview.php', index)
-        
         
         
