@@ -6,12 +6,12 @@ with open("README.md", "r") as fh:
 setuptools.setup(
     name="tracemoepy",
     packagaes = ['tracemoepy'],
-    version="0.3",
+    version="0.1",
     description="Trace.moe python wrapper",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/DragSama/tracemoepy",
-    download_url = 'https://github.com/DragSama/tracemoepy/archive/v0.3.tar.gz',
+    download_url = 'https://github.com/DragSama/tracemoepy/releases',
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
