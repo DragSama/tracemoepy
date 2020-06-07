@@ -8,7 +8,7 @@ class TraceMoe:
         self.media_url = "https://media.trace.moe/"
         self.api_token = api_token
         self.r_session = Session()
-        self.session.headers = {
+        self.r_session.headers = {
             "Content-Type": "application/json"
         }
     
