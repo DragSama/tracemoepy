@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 setuptools.setup(
     name="tracemoepy",
     packagaes = ['tracemoepy'],
-    version="0.1",
+    version="0.2",
     description="Trace.moe python wrapper",
     long_description=long_description,
     long_description_content_type="text/markdown",
