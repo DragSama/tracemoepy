@@ -1,5 +1,5 @@
-class APILimitReached(Exception):
-    """Raised when API Limit is reached"""
+class TooManyRequests(Exception):
+    """Raised when API Limit is reached or Too many requests in short period of time"""
 
 class EntityTooLarge(Exception):
     """Raised when image size > 10MB"""
