@@ -1,6 +1,6 @@
 from base64 import b64encode
 from requests import Session
-from .errors import EmptyImage, InvalidToken, ServerError
+from .errors import EmptyImage, InvalidToken, ServerError, TooManyRequests
 
 class TraceMoe:
     """Tracemoe class with all the stuff"""
@@ -61,6 +61,8 @@ class TraceMoe:
             raise InvalidToken('You are using Invalid token!')
         elif response.status_code in [500, 503]:
             raise ServerError('Image is malformed or Something went wrong')
+        elif response.status_code == 429:
+            raise TooManyRequests(response.text)
     
     def create_preview(self, json:dict, path:str, index:int = 0,) -> bytes:
         """
