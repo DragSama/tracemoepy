@@ -39,7 +39,7 @@ class TraceMoe:
             url += f"?token={self.api_token}"
 
         if is_url:
-            return self.r_session.get(
+            response = self.r_session.get(
                 url, params={"url": path}
             ).json()
 
