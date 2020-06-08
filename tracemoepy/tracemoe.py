@@ -54,7 +54,7 @@ class TraceMoe:
                 url, json={"image": encoded}
                 )
         if response.status_code == 200:
-            return response
+            return response.json()
         elif response.status_code == 400:
             raise EmptyImage('Image provided was empty!')
         elif response.status_code == 403:
