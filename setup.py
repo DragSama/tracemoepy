@@ -5,7 +5,7 @@ with open("README.md", "r") as f:
 
 with open("tracemoepy/__init__.py", 'r') as f:
     import re
-    version = re.search('__version__ = (\d+)', f.read()).group(1)
+    version = re.search('__version__ = (\S+)', f.read()).group(1)
 
 with open("requirements.txt", 'r') as f:
     install_requires = f.read().split('\n')
