@@ -29,6 +29,10 @@ class TraceMoe:
            is_url: Treat the path as a url or not
         Returns:
            dict: response from server
+        Raises:
+           EmptyImage: Raised If Image Is empty
+           InvalidToken: Raised when token provided Is Invalid
+           ServerError: Raised If server Is having problem or Image Is malformed.
         """
         url = f"{self.base_url}api/search"
         if self.api_token:
@@ -44,7 +48,7 @@ class TraceMoe:
                 encoded = b64encode(f.read()).decode("utf-8")
                 response = self.r_session.post(
                 url, json={"image": encoded}
-                ).
+                )
         else:
             response = self.r_session.post(
                 url, json={"image": encoded}
