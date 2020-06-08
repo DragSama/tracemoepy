@@ -1,12 +1,19 @@
 import setuptools
 
-with open("README.md", "r") as fh:
-    long_description = fh.read()
+with open("README.md", "r") as f:
+    long_description = f.read()
+
+with open("tracemoepy/__init__.py", 'r') as f:
+    import re
+    version = re.search('__version__ = (\d+)', f.read()).group(1)
+
+with open("requirements.txt", 'r') as f:
+    install_requires = f.read().split('\n')
 
 setuptools.setup(
     name="tracemoepy",
     packagaes = ['tracemoepy'],
-    version="0.8",
+    version=version,
     description="Trace.moe python wrapper",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -18,8 +25,6 @@ setuptools.setup(
         "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
         "Operating System :: OS Independent"
     ],
-    install_requires = [
-        "requests"
-    ],
+    install_requires = install_requires,
     python_requires='>=3.6'
 )
