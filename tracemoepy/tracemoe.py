@@ -1,5 +1,6 @@
 from base64 import b64encode
 from requests import Session
+from .errors import EmptyImage, InvalidToken, ServerError
 
 class TraceMoe:
     """Tracemoe class with all the stuff"""
@@ -41,13 +42,21 @@ class TraceMoe:
         elif encode:
             with open(path, "rb") as f:
                 encoded = b64encode(f.read()).decode("utf-8")
-                return self.r_session.post(
+                response = self.r_session.post(
                 url, json={"image": encoded}
-                ).json()
+                ).
         else:
-            return self.r_session.post(
+            response = self.r_session.post(
                 url, json={"image": encoded}
-                ).json()
+                )
+        if response.status_code == 200:
+            return response
+        elif response.status_code == 400:
+            raise EmptyImage('Image provided was empty!')
+        elif response.status_code == 403:
+            raise InvalidToken('You are using Invalid token!')
+        elif response.status_code in [500, 503]:
+            raise ServerError('Image is malformed or Something went wrong')
     
     def create_preview(self, json:dict, path:str, index:int = 0,) -> bytes:
         """
