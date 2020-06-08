@@ -2,6 +2,9 @@
 trace.moe python wrapper, does not support all api methods yet.
 Work in progress.
 
+[![PyPI version](https://img.shields.io/pypi/v/tracemoepy?color=bright-green)](https://img.shields.io/pypi/v/tracemoepy?color=bright-green)
+[![Downloads](https://img.shields.io/pypi/dd/tracemoepy)](https://img.shields.io/pypi/dd/tracemoepy)
+
 # Install
 - Install using pip: `pip install tracemoepy`
 
