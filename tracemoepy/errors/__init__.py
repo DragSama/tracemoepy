@@ -7,8 +7,8 @@ class EntityTooLarge(Exception):
 class ServerError(Exception):
     """Something wrong with the trace.moe server or Image provided was malformed"""
  
-class IvalidToken(Exception):
-    """Ivalid token was provided"""
+class InvalidToken(Exception):
+    """Invalid token was provided"""
     
 class EmptyImage(Exception):
     """Image provided was empty"""
