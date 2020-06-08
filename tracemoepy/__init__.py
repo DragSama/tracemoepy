@@ -1,2 +1,2 @@
 from .tracemoe import TraceMoe
-from errors import *
+from .errors import *
