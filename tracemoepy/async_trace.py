@@ -2,7 +2,7 @@ from base64 import b64encode
 import aiohttp
 from .errors import EmptyImage, InvalidToken, ServerError, TooManyRequests
 
-class TraceMoe:
+class Async_Trace:
     """Tracemoe class with all the stuff"""
     def __init__(self, api_token:str=""):
         self.base_url = "https://trace.moe/"
