@@ -8,9 +8,17 @@ class TraceMoe:
         self.media_url = "https://media.trace.moe/"
         self.api_token = api_token
         self.r_session = Session()
-        self.r_session.headers = {
-            "Content-Type": "application/json"
-        }
+        self.r_session.headers = {"Content-Type": "application/json"}
+    
+    def get_me(self) -> dict:
+        """
+        Lets you check the search quota and limit for your account (or IP address).
+        Returns:
+          dict: response from server
+        """
+        url = f"{self.base_url}me"
+        if self.api_token: url += f"?token={self.token}"
+        return self.r_session.get(url).json()
     
     def search(self, path:str, encode:bool=True, is_url:bool=False) -> dict:
         """
@@ -19,7 +27,7 @@ class TraceMoe:
            encode: True if Img file name is given
            is_url: Treat the path as a url or not
         Returns:
-           json response
+           dict: response from server
         """
         url = f"{self.base_url}api/search"
         if self.api_token:
@@ -48,7 +56,7 @@ class TraceMoe:
            index: Which result to get
            path: Path to use, preview.php, thumbnail.php etc.
         Returns:
-           Image content
+           bytes: Video/Image content
         """
         json = json["docs"][index]
         url = f"{self.base_url}{path}?anilist_id={json['anilist_id']}"\
@@ -56,13 +64,23 @@ class TraceMoe:
         print(url)
         return self.r_session.get(url).content
     
+    def image_preview(self, json:dict, index:int = 0) -> bytes:
+        """
+        Args:
+           json: Python dict given by search
+           index: Which result to get
+        Returns:
+           bytes: Video content
+        """
+        return self.create_preview(json, 'thumbnail.php', index)
+    
     def video_preview(self, json:dict, index:int = 0) -> bytes:
         """
         Args:
            json: Python dict given by search
            index: Which result to get
         Returns:
-           Image content
+           bytes: Video content
         """
         return self.create_preview(json, 'preview.php', index)
         
