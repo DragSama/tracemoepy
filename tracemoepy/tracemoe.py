@@ -42,7 +42,7 @@ class TraceMoe:
         if is_url:
             response = requests.get(
                 url, params={"url": path}
-            ).json()
+            )
 
         elif encode:
             with open(path, "rb") as f:
