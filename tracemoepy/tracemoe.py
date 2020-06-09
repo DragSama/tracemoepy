@@ -3,12 +3,13 @@ import requests
 from .errors import EmptyImage, InvalidToken, ServerError, TooManyRequests
 
 class TraceMoe:
+
     """Tracemoe class with all the stuff"""
     def __init__(self, api_token:str=""):
         self.base_url = "https://trace.moe/"
         self.media_url = "https://media.trace.moe/"
         self.api_token = api_token
-    
+
     def get_me(self) -> dict:
         """
         Lets you check the search quota and limit for your account (or IP address).
@@ -108,7 +109,7 @@ class TraceMoe:
         """
         response = response["docs"][index]
         url = f'{self.media_url}video/{response["anilist_id"]}/'\
-              f'{response["filename"]}?t={response["at"]}&{token=response["tokenthumb"]}'
+              f'{response["filename"]}?t={response["at"]}&token={response["tokenthumb"]}'
         if mute: url += "&mute"
         return requests.get(url).content
         
