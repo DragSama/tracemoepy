@@ -10,7 +10,7 @@ class Async_Trace:
         self.api_token = api_token
         self.aio_session = aiohttp.ClientSession()
         self.aio_session.headers = {"Content-Type": "application/json"}
-    
+
     async def get_me(self) -> dict:
         """
         Lets you check the search quota and limit for your account (or IP address).
@@ -52,15 +52,15 @@ class Async_Trace:
             response = await self.aio_session.post(
                 url, json={"image": encoded}
                 )
-        if response.status_code == 200:
+        if response.status == 200:
             return response.json()
-        elif response.status_code == 400:
+        elif response.status == 400:
             raise EmptyImage('Image provided was empty!')
-        elif response.status_code == 403:
+        elif response.status == 403:
             raise InvalidToken('You are using Invalid token!')
-        elif response.status_code in [500, 503]:
+        elif response.status in [500, 503]:
             raise ServerError('Image is malformed or Something went wrong')
-        elif response.status_code == 429:
+        elif response.status == 429:
             raise TooManyRequests(response.text)
     
     async def create_preview(self, json:dict, path:str, index:int = 0,) -> bytes:
@@ -77,6 +77,23 @@ class Async_Trace:
               f"&file={json['filename']}&t={json['at']}&token={json['tokenthumb']}"
         return await self.aio_session.get(url).content
     
+    async def natural_preview(self, response:dict, index:int=0, mute:bool=False) -> bytes:
+        """
+        Video Preview with Natural Scene Cutting
+        Arguments:
+            response: server response
+            index: which result to get
+            mute: mute video or not.
+        Returns:
+            bytes: Video content
+        """
+        response = response["docs"][index]
+        url = f'{self.media_url}video/{response["anilist_id"]}/'\
+              f'{response["filename"]}?t={response["at"]}&{token=response["tokenthumb"]}'
+        if mute:
+            url += "&mute"
+        return self.aio_session.get(url).content
+
     async def image_preview(self, json:dict, index:int = 0) -> bytes:
         """
         Args:
