@@ -32,6 +32,7 @@ class TraceMoe:
            EmptyImage: Raised If Image Is empty
            InvalidToken: Raised when token provided Is Invalid
            ServerError: Raised If server Is having problem or Image Is malformed.
+           TooManyRequests: Raised If you make too many requests to server.
         """
         url = f"{self.base_url}api/search"
         if self.api_token:
