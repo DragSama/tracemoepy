@@ -21,7 +21,7 @@ class Async_Trace:
         """
         url = f"{self.base_url}me"
         if self.api_token: url += f"?token={self.token}"
-        return await self.aio_session.get(url).json()
+        return await (await self.aio_session.get(url)).json()
 
     async def search(self, path:str, encode:bool=True, is_url:bool=False) -> dict:
         """
@@ -78,7 +78,7 @@ class Async_Trace:
         json = json["docs"][index]
         url = f"{self.base_url}{path}?anilist_id={json['anilist_id']}"\
               f"&file={json['filename']}&t={json['at']}&token={json['tokenthumb']}"
-        return await self.aio_session.get(url).content.read()
+        return await (await self.aio_session.get(url)).content.read()
     
     async def natural_preview(self, response:dict, index:int=0, mute:bool=False) -> bytes:
         """
@@ -95,7 +95,7 @@ class Async_Trace:
               f'{response["filename"]}?t={response["at"]}&token={response["tokenthumb"]}'
         if mute:
             url += "&mute"
-        return self.aio_session.get(url).content.read()
+        return await (await self.aio_session.get(url)).content.read()
 
     async def image_preview(self, json:dict, index:int = 0) -> bytes:
         """
