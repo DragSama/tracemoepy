@@ -4,8 +4,9 @@ from .errors import EmptyImage, InvalidToken, ServerError, TooManyRequests
 
 class Async_Trace:
 
-    """Tracemoe class with all the stuff"""
+    """Tracemoe class with all the stuff."""
     def __init__(self, api_token:str=""):
+        """Setup all urls and session."""
         self.base_url = "https://trace.moe/"
         self.media_url = "https://media.trace.moe/"
         self.api_token = api_token
@@ -21,7 +22,7 @@ class Async_Trace:
         url = f"{self.base_url}me"
         if self.api_token: url += f"?token={self.token}"
         return await self.aio_session.get(url).json()
-    
+
     async def search(self, path:str, encode:bool=True, is_url:bool=False) -> dict:
         """
         Args:
