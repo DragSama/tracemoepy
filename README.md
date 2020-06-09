@@ -2,7 +2,8 @@
 trace.moe python wrapper, does not support all api methods yet.
 Work in progress.
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/afb292fa1406455e8c804bfdd18f5eb7)](https://app.codacy.com/manual/DragSama/tracemoepy?utm_source=github.com&utm_medium=referral&utm_content=DragSama/tracemoepy&utm_campaign=Badge_Grade_Dashboard)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/527bf31631e3494493951dda87479d9b)](https://www.codacy.com/manual/DragSama/tracemoepy?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=DragSama/tracemoepy&amp;utm_campaign=Badge_Grade)
+
 [![PyPI version](https://img.shields.io/pypi/v/tracemoepy?color=bright-green)](https://pypi.org/project/tracemoepy/)
 [![Downloads](https://img.shields.io/pypi/dd/tracemoepy)](https://pypi.org/project/tracemoepy/)
 
