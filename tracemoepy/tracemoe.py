@@ -4,8 +4,9 @@ from .errors import EmptyImage, InvalidToken, ServerError, TooManyRequests
 
 class TraceMoe:
 
-    """Tracemoe class with all the stuff"""
+    """Tracemoe class with all the stuff."""
     def __init__(self, api_token:str=""):
+        """Setup all vars."""
         self.base_url = "https://trace.moe/"
         self.media_url = "https://media.trace.moe/"
         self.api_token = api_token
@@ -19,7 +20,7 @@ class TraceMoe:
         url = f"{self.base_url}me"
         if self.api_token: url += f"?token={self.token}"
         return requests.get(url).json()
-    
+
     def search(self, path:str, encode:bool=True, is_url:bool=False) -> dict:
         """
         Args:
@@ -113,5 +114,3 @@ class TraceMoe:
               f'{response["filename"]}?t={response["at"]}&token={response["tokenthumb"]}'
         if mute: url += "&mute"
         return requests.get(url).content
-        
-        
