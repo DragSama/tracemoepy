@@ -3,6 +3,7 @@ import aiohttp
 from .errors import EmptyImage, InvalidToken, ServerError, TooManyRequests
 
 class Async_Trace:
+
     """Tracemoe class with all the stuff"""
     def __init__(self, api_token:str=""):
         self.base_url = "https://trace.moe/"
@@ -33,6 +34,7 @@ class Async_Trace:
            EmptyImage: Raised If Image Is empty
            InvalidToken: Raised when token provided Is Invalid
            ServerError: Raised If server Is having problem or Image Is malformed.
+           TooManyRequests: Raised when you are making too many requests
         """
         url = f"{self.base_url}api/search"
         if self.api_token:
@@ -89,7 +91,7 @@ class Async_Trace:
         """
         response = response["docs"][index]
         url = f'{self.media_url}video/{response["anilist_id"]}/'\
-              f'{response["filename"]}?t={response["at"]}&{token=response["tokenthumb"]}'
+              f'{response["filename"]}?t={response["at"]}&token={response["tokenthumb"]}'
         if mute:
             url += "&mute"
         return self.aio_session.get(url).content
