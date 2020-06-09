@@ -56,7 +56,7 @@ class Async_Trace:
                 url, json={"image": encoded}
                 )
         if response.status == 200:
-            return response.json()
+            return await response.json()
         elif response.status == 400:
             raise EmptyImage('Image provided was empty!')
         elif response.status == 403:
@@ -64,7 +64,7 @@ class Async_Trace:
         elif response.status in [500, 503]:
             raise ServerError('Image is malformed or Something went wrong')
         elif response.status == 429:
-            raise TooManyRequests(response.text)
+            raise TooManyRequests(await response.text)
     
     async def create_preview(self, json:dict, path:str, index:int = 0,) -> bytes:
         """
@@ -78,7 +78,7 @@ class Async_Trace:
         json = json["docs"][index]
         url = f"{self.base_url}{path}?anilist_id={json['anilist_id']}"\
               f"&file={json['filename']}&t={json['at']}&token={json['tokenthumb']}"
-        return await self.aio_session.get(url).content
+        return await self.aio_session.get(url).content.read()
     
     async def natural_preview(self, response:dict, index:int=0, mute:bool=False) -> bytes:
         """
@@ -95,7 +95,7 @@ class Async_Trace:
               f'{response["filename"]}?t={response["at"]}&token={response["tokenthumb"]}'
         if mute:
             url += "&mute"
-        return self.aio_session.get(url).content
+        return self.aio_session.get(url).content.read()
 
     async def image_preview(self, json:dict, index:int = 0) -> bytes:
         """
