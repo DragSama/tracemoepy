@@ -65,6 +65,8 @@ class Async_Trace:
             raise ServerError('Image is malformed or Something went wrong')
         elif response.status == 429:
             raise TooManyRequests(await response.text)
+        else:
+            raise ServerError(f'Unknown error: {response.status}')
     
     async def create_preview(self, json:dict, path:str, index:int = 0,) -> bytes:
         """
@@ -83,7 +85,7 @@ class Async_Trace:
     async def natural_preview(self, response:dict, index:int=0, mute:bool=False) -> bytes:
         """
         Video Preview with Natural Scene Cutting
-        Arguments:
+        Args:
             response: server response
             index: which result to get
             mute: mute video or not.
