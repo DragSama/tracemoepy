@@ -64,6 +64,8 @@ class TraceMoe:
             raise ServerError('Image is malformed or Something went wrong')
         elif response.status_code == 429:
             raise TooManyRequests(response.text)
+        else:
+            raise ServerError(f'Unknown error: {response.status_code}')
     
     def create_preview(self, json:dict, path:str, index:int = 0,) -> bytes:
         """
@@ -102,7 +104,7 @@ class TraceMoe:
     def natural_preview(self, response:dict, index:int=0, mute:bool=False) -> bytes:
         """
         Video Preview with Natural Scene Cutting
-        Arguments:
+        Args:
             response: server response
             index: which result to pick
             mute: mute video or not.
