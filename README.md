@@ -21,6 +21,7 @@ tracemoe = tracemoepy.tracemoe.TraceMoe()
 ```python
 print(tracemoe.search('https://trace.moe/img/flipped-good.jpg', is_url = True))
 ```
+
 - Or if you provide base64 encoded image:
 ```python
 print(tracemoe.search(image, encode=False))
@@ -40,4 +41,33 @@ output = tracemoe.search('https://trace.moe/img/flipped-good.jpg', is_url = True
 video = tracemoe.video_preview(output)
 with open('preview.mp4', 'wb') as f:
   f.write(video)
+```
+## Asyncio
+```python
+import tracemoepy
+import asyncio
+tracemoe = tracemoe.asynctrace.Async_Trace()
+async def anything():
+   #return await + Anything from the above examples
+   #like:
+   return await tracemoe.search('https://trace.moe/img/flipped-good.jpg', is_url = True)
+loop = asyncio.get_event_loop()
+loop.run(anything())
+```   
+# Errors
+
+- `TooManyRequests`: Raised when API Limit is reached or Too many requests in short period of time.
+- `EntityTooLarge`: Raised when image size is greater than max size of 10MB.
+- `ServerError`: Raised when Something wrong with the trace.moe server or Image provided was malformed.
+- `InvalidToken`: Raised when Invalid token was provided.
+- `EmptyImage`: Raised when Image provided was empty.
+- All these errors are located at tracemoepy.errors, Example of handling Exception:
+```python
+from tracemoepy.errors import TooManyRequests
+
+try:
+  # Do something
+except TooManyRequests as t:
+  print(t)
+  # Do something if error
 ```
