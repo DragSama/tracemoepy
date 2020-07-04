@@ -52,7 +52,7 @@ async def anything():
    #like:
    return await tracemoe.search('https://trace.moe/img/flipped-good.jpg', is_url = True)
 loop = asyncio.get_event_loop()
-loop.run(anything())
+loop.run_until_complete(anything())
 ```   
 # Errors
 
