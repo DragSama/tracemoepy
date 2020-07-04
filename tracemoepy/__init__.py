@@ -5,7 +5,7 @@ from .async_trace import Async_Trace
 from .errors import *
 
 __author__ = ["DragSama"]
-__version__ = 3.1
+__version__ = 3.2
 
 if __name__ == '__main__':
   from pprint import pprint
