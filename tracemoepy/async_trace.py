@@ -1,16 +1,22 @@
 from base64 import b64encode
+from urllib.parse import quote
+
 import aiohttp
+
 from .errors import EmptyImage, InvalidToken, ServerError, TooManyRequests
 
 class Async_Trace:
 
     """Tracemoe class with all the stuff."""
-    def __init__(self, api_token:str=""):
+    def __init__(self, api_token:str="", session = False):
         """Setup all urls and session."""
         self.base_url = "https://trace.moe/"
         self.media_url = "https://media.trace.moe/"
         self.api_token = api_token
-        self.aio_session = aiohttp.ClientSession()
+        if not session:
+            self.aio_session = aiohttp.ClientSession()
+        else:
+            self.aio_session = session
         self.aio_session.headers = {"Content-Type": "application/json"}
 
     async def get_me(self) -> dict:
@@ -23,12 +29,13 @@ class Async_Trace:
         if self.api_token: url += f"?token={self.token}"
         return await (await self.aio_session.get(url)).json()
 
-    async def search(self, path:str, encode:bool=True, is_url:bool=False) -> dict:
+    async def search(self, path:str, encode:bool=False, upload_file = False,is_url:bool=False) -> dict:
         """
         Args:
-           path: Image url or Img file name or base64 encoded Image
+           path: Image url or Img file name or base64 encoded Image or Image path
            encode: True if Img file name is given
            is_url: Treat the path as a url or not
+           upload_file: Upload file
         Returns:
            dict: response from server
         Raises:
@@ -45,6 +52,11 @@ class Async_Trace:
             response = await self.aio_session.get(
                 url, params={"url": path}
             )
+        elif upload_file:
+            response = await self.aio_session.post(
+                'https://trace.moe/api/search',
+                data = {'image': open(path, 'rb')}
+                )
         elif encode:
             with open(path, "rb") as f:
                 encoded = b64encode(f.read()).decode("utf-8")
@@ -79,7 +91,7 @@ class Async_Trace:
         """
         json = json["docs"][index]
         url = f"{self.base_url}{path}?anilist_id={json['anilist_id']}"\
-              f"&file={json['filename']}&t={json['at']}&token={json['tokenthumb']}"
+              f"&file={quote(json['filename'])}&t={json['at']}&token={json['tokenthumb']}"
         return await (await self.aio_session.get(url)).content.read()
     
     async def natural_preview(self, response:dict, index:int=0, mute:bool=False) -> bytes:
@@ -94,7 +106,7 @@ class Async_Trace:
         """
         response = response["docs"][index]
         url = f'{self.media_url}video/{response["anilist_id"]}/'\
-              f'{response["filename"]}?t={response["at"]}&token={response["tokenthumb"]}'
+              f'{quote(response["filename"])}?t={response["at"]}&token={response["tokenthumb"]}'
         if mute:
             url += "&mute"
         return await (await self.aio_session.get(url)).content.read()
@@ -118,5 +130,3 @@ class Async_Trace:
            bytes: Video content
         """
         return await self.create_preview(json, 'preview.php', index)
-        
-        
