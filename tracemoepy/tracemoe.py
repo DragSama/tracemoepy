@@ -1,5 +1,8 @@
 from base64 import b64encode
+from urllib.parse import quote
+
 import requests
+
 from .errors import EmptyImage, InvalidToken, ServerError, TooManyRequests
 
 class TraceMoe:
@@ -21,12 +24,13 @@ class TraceMoe:
         if self.api_token: url += f"?token={self.token}"
         return requests.get(url).json()
 
-    def search(self, path:str, encode:bool=True, is_url:bool=False) -> dict:
+    def search(self, path:str, encode:bool=True, is_url:bool=False, upload_file:bool=False) -> dict:
         """
         Args:
            path: Image url or Img file name or base64 encoded Image
            encode: True if Img file name is given
            is_url: Treat the path as a url or not
+           upload_file: Upload file
         Returns:
            dict: response from server
         Raises:
@@ -43,7 +47,8 @@ class TraceMoe:
             response = requests.get(
                 url, params={"url": path}
             )
-
+        elif upload_file:
+            response = requests.post(url, files = {'image': open(path, 'rb')})
         elif encode:
             with open(path, "rb") as f:
                 encoded = b64encode(f.read()).decode("utf-8")
@@ -78,7 +83,7 @@ class TraceMoe:
         """
         json = json["docs"][index]
         url = f"{self.base_url}{path}?anilist_id={json['anilist_id']}"\
-              f"&file={json['filename']}&t={json['at']}&token={json['tokenthumb']}"
+              f"&file={quote(json['filename'])}&t={json['at']}&token={json['tokenthumb']}"
         return requests.get(url).content
     
     def image_preview(self, json:dict, index:int = 0) -> bytes:
@@ -113,6 +118,6 @@ class TraceMoe:
         """
         response = response["docs"][index]
         url = f'{self.media_url}video/{response["anilist_id"]}/'\
-              f'{response["filename"]}?t={response["at"]}&token={response["tokenthumb"]}'
+              f'{quote(response["filename"])}?t={response["at"]}&token={response["tokenthumb"]}'
         if mute: url += "&mute"
         return requests.get(url).content
