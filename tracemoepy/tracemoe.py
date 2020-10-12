@@ -27,7 +27,7 @@ class TraceMoe:
     def search(self, path:str, encode:bool=True, is_url:bool=False, upload_file:bool=False) -> dict:
         """
         Args:
-           path: Image url or Img file name or base64 encoded Image
+           path: Image url or Img file name or base64 encoded Image or Image path
            encode: True if Img file name is given
            is_url: Treat the path as a url or not
            upload_file: Upload file
