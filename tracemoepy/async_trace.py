@@ -4,11 +4,14 @@ from urllib.parse import quote
 import aiohttp
 
 from .errors import EmptyImage, InvalidToken, ServerError, TooManyRequests
+from .customs import convert
+
 
 class Async_Trace:
 
     """Tracemoe class with all the stuff."""
-    def __init__(self, api_token:str="", session = False):
+
+    def __init__(self, api_token: str = "", session=False):
         """Setup all urls and session."""
         self.base_url = "https://trace.moe/"
         self.media_url = "https://media.trace.moe/"
@@ -26,10 +29,11 @@ class Async_Trace:
           dict: response from server
         """
         url = f"{self.base_url}me"
-        if self.api_token: url += f"?token={self.token}"
+        if self.api_token:
+            url += f"?token={self.token}"
         return await (await self.aio_session.get(url)).json()
 
-    async def search(self, path:str, encode:bool=False, upload_file = False,is_url:bool=False) -> dict:
+    async def search(self, path: str, encode: bool = False, upload_file=False, is_url: bool = False) -> dict:
         """
         Args:
            path: Image url or Img file name or base64 encoded Image or Image path
@@ -55,20 +59,20 @@ class Async_Trace:
         elif upload_file:
             response = await self.aio_session.post(
                 'https://trace.moe/api/search',
-                data = {'image': open(path, 'rb')}
-                )
+                data={'image': open(path, 'rb')}
+            )
         elif encode:
             with open(path, "rb") as f:
                 encoded = b64encode(f.read()).decode("utf-8")
                 response = await self.aio_session.post(
-                url, json={"image": encoded}
+                    url, json={"image": encoded}
                 )
         else:
             response = await self.aio_session.post(
                 url, json={"image": encoded}
-                )
+            )
         if response.status == 200:
-            return await response.json()
+            return convert((await response.json()))
         elif response.status == 400:
             raise EmptyImage('Image provided was empty!')
         elif response.status == 403:
@@ -79,8 +83,8 @@ class Async_Trace:
             raise TooManyRequests(await response.text)
         else:
             raise ServerError(f'Unknown error: {response.status}')
-    
-    async def create_preview(self, json:dict, path:str, index:int = 0,) -> bytes:
+
+    async def create_preview(self, json: dict, path: str, index: int = 0,) -> bytes:
         """
         Args:
            json: Python dict given by search
@@ -93,8 +97,8 @@ class Async_Trace:
         url = f"{self.base_url}{path}?anilist_id={json['anilist_id']}"\
               f"&file={quote(json['filename'])}&t={json['at']}&token={json['tokenthumb']}"
         return await (await self.aio_session.get(url)).content.read()
-    
-    async def natural_preview(self, response:dict, index:int=0, mute:bool=False) -> bytes:
+
+    async def natural_preview(self, response: dict, index: int = 0, mute: bool = False) -> bytes:
         """
         Video Preview with Natural Scene Cutting
         Args:
@@ -111,7 +115,7 @@ class Async_Trace:
             url += "&mute"
         return await (await self.aio_session.get(url)).content.read()
 
-    async def image_preview(self, json:dict, index:int = 0) -> bytes:
+    async def image_preview(self, json: dict, index: int = 0) -> bytes:
         """
         Args:
            json: Python dict given by search
@@ -120,8 +124,8 @@ class Async_Trace:
            bytes: Video content
         """
         return await self.create_preview(json, 'thumbnail.php', index)
-    
-    async def video_preview(self, json:dict, index:int = 0) -> bytes:
+
+    async def video_preview(self, json: dict, index: int = 0) -> bytes:
         """
         Args:
            json: Python dict given by search

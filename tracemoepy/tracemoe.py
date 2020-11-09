@@ -4,11 +4,14 @@ from urllib.parse import quote
 import requests
 
 from .errors import EmptyImage, InvalidToken, ServerError, TooManyRequests
+from .customs import convert
+
 
 class TraceMoe:
 
     """Tracemoe class with all the stuff."""
-    def __init__(self, api_token:str=""):
+
+    def __init__(self, api_token: str = ""):
         """Setup all vars."""
         self.base_url = "https://trace.moe/"
         self.media_url = "https://media.trace.moe/"
@@ -21,10 +24,11 @@ class TraceMoe:
           dict: response from server
         """
         url = f"{self.base_url}me"
-        if self.api_token: url += f"?token={self.token}"
+        if self.api_token:
+            url += f"?token={self.token}"
         return requests.get(url).json()
 
-    def search(self, path:str, encode:bool=True, is_url:bool=False, upload_file:bool=False) -> dict:
+    def search(self, path: str, encode: bool = True, is_url: bool = False, upload_file: bool = False) -> dict:
         """
         Args:
            path: Image url or Img file name or base64 encoded Image or Image path
@@ -48,19 +52,19 @@ class TraceMoe:
                 url, params={"url": path}
             )
         elif upload_file:
-            response = requests.post(url, files = {'image': open(path, 'rb')})
+            response = requests.post(url, files={'image': open(path, 'rb')})
         elif encode:
             with open(path, "rb") as f:
                 encoded = b64encode(f.read()).decode("utf-8")
                 response = requests.post(
-                url, json={"image": encoded}
+                    url, json={"image": encoded}
                 )
         else:
             response = requests.post(
                 url, json={"image": encoded}
-                )
+            )
         if response.status_code == 200:
-            return response.json()
+            return convert(response.json())
         elif response.status_code == 400:
             raise EmptyImage('Image provided was empty!')
         elif response.status_code == 403:
@@ -71,8 +75,8 @@ class TraceMoe:
             raise TooManyRequests(response.text)
         else:
             raise ServerError(f'Unknown error: {response.status_code}')
-    
-    def create_preview(self, json:dict, path:str, index:int = 0,) -> bytes:
+
+    def create_preview(self, json: dict, path: str, index: int = 0) -> bytes:
         """
         Args:
            json: Python dict given by search
@@ -85,8 +89,8 @@ class TraceMoe:
         url = f"{self.base_url}{path}?anilist_id={json['anilist_id']}"\
               f"&file={quote(json['filename'])}&t={json['at']}&token={json['tokenthumb']}"
         return requests.get(url).content
-    
-    def image_preview(self, json:dict, index:int = 0) -> bytes:
+
+    def image_preview(self, json: dict, index: int = 0) -> bytes:
         """
         Args:
            json: Python dict given by search
@@ -95,8 +99,8 @@ class TraceMoe:
            bytes: Video content
         """
         return self.create_preview(json, 'thumbnail.php', index)
-    
-    def video_preview(self, json:dict, index:int = 0) -> bytes:
+
+    def video_preview(self, json: dict, index: int = 0) -> bytes:
         """
         Args:
            json: Python dict given by search
@@ -105,8 +109,8 @@ class TraceMoe:
            bytes: Video content
         """
         return self.create_preview(json, 'preview.php', index)
-    
-    def natural_preview(self, response:dict, index:int=0, mute:bool=False) -> bytes:
+
+    def natural_preview(self, response: dict, index: int = 0, mute: bool = False) -> bytes:
         """
         Video Preview with Natural Scene Cutting
         Args:
@@ -119,5 +123,6 @@ class TraceMoe:
         response = response["docs"][index]
         url = f'{self.media_url}video/{response["anilist_id"]}/'\
               f'{quote(response["filename"])}?t={response["at"]}&token={response["tokenthumb"]}'
-        if mute: url += "&mute"
+        if mute:
+            url += "&mute"
         return requests.get(url).content
