@@ -24,7 +24,7 @@ class Dict(dict):
                         new_list.append(i.to_dict())
                     else:
                         new_list.append(i)
-                        _dict[key] = new_list
+                _dict[key] = new_list
         return _dict
 
     def prettify(self, indent=4):
