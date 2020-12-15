@@ -1,39 +1,44 @@
+from .helpers.superdict import convert, SuperDict
+from .helpers.constants import BASE_URL, BASE_MEDIA_URL, IMAGE_PREVIEW, VIDEO_PREVIEW
+from .errors import EmptyImage, InvalidToken, ServerError, TooManyRequests
+
+from typing import Union
 from base64 import b64encode
 from urllib.parse import quote
 
 import aiohttp
 
-from .errors import EmptyImage, InvalidToken, ServerError, TooManyRequests
-from .customs import convert
 
-
-class Async_Trace:
+class AsyncTrace:
 
     """Tracemoe class with all the stuff."""
 
     def __init__(self, api_token: str = "", session=False):
         """Setup all urls and session."""
-        self.base_url = "https://trace.moe/"
-        self.media_url = "https://media.trace.moe/"
+        self.base_url = BASE_URL
+        self.media_url = BASE_MEDIA_URL
         self.api_token = api_token
         if not session:
-            self.aio_session = aiohttp.ClientSession()
+            self.aio_session = aiohttp.ClientSession(
+                {"Content-Type": "application/json"}
+            )
         else:
             self.aio_session = session
-        self.aio_session.headers = {"Content-Type": "application/json"}
 
-    async def get_me(self) -> dict:
+    async def get_me(self) -> SuperDict:
         """
         Lets you check the search quota and limit for your account (or IP address).
         Returns:
-          dict: response from server
+          SuperDict: response from server
         """
         url = f"{self.base_url}me"
         if self.api_token:
             url += f"?token={self.token}"
-        return await (await self.aio_session.get(url)).json()
+        return convert((await (await self.aio_session.get(url)).json()))
 
-    async def search(self, path: str, encode: bool = False, upload_file=False, is_url: bool = False) -> dict:
+    async def search(
+        self, path: str, encode: bool = False, upload_file=False, is_url: bool = False
+    ) -> SuperDict:
         """
         Args:
            path: Image url or Img file name or base64 encoded Image or Image path
@@ -41,7 +46,7 @@ class Async_Trace:
            is_url: Treat the path as a url or not
            upload_file: Upload file
         Returns:
-           dict: response from server
+           SuperDict: response from server
         Raises:
            EmptyImage: Raised If Image Is empty
            InvalidToken: Raised when token provided Is Invalid
@@ -53,38 +58,36 @@ class Async_Trace:
             url += f"?token={self.api_token}"
 
         if is_url:
-            response = await self.aio_session.get(
-                url, params={"url": path}
-            )
+            response = await self.aio_session.get(url, params={"url": path})
         elif upload_file:
             response = await self.aio_session.post(
-                'https://trace.moe/api/search',
-                data={'image': open(path, 'rb')}
+                url, data={"image": open(path, "rb")}
             )
         elif encode:
             with open(path, "rb") as f:
                 encoded = b64encode(f.read()).decode("utf-8")
-                response = await self.aio_session.post(
-                    url, json={"image": encoded}
-                )
+                response = await self.aio_session.post(url, json={"image": encoded})
         else:
-            response = await self.aio_session.post(
-                url, json={"image": encoded}
-            )
+            response = await self.aio_session.post(url, json={"image": encoded})
         if response.status == 200:
             return convert((await response.json()))
         elif response.status == 400:
-            raise EmptyImage('Image provided was empty!')
+            raise EmptyImage("Image provided was empty!")
         elif response.status == 403:
-            raise InvalidToken('You are using Invalid token!')
+            raise InvalidToken("You are using Invalid token!")
         elif response.status in [500, 503]:
-            raise ServerError('Image is malformed or Something went wrong')
+            raise ServerError("Image is malformed or Something went wrong")
         elif response.status == 429:
             raise TooManyRequests(await response.text)
         else:
-            raise ServerError(f'Unknown error: {response.status}')
+            raise ServerError(f"Unknown error: {response.status}")
 
-    async def create_preview(self, json: dict, path: str, index: int = 0,) -> bytes:
+    async def create_preview(
+        self,
+        json: Union[dict, SuperDict],
+        path: str,
+        index: int = 0,
+    ) -> bytes:
         """
         Args:
            json: Python dict given by search
@@ -94,11 +97,15 @@ class Async_Trace:
            bytes: Video/Image content
         """
         json = json["docs"][index]
-        url = f"{self.base_url}{path}?anilist_id={json['anilist_id']}"\
-              f"&file={quote(json['filename'])}&t={json['at']}&token={json['tokenthumb']}"
+        url = (
+            f"{self.base_url}{path}?anilist_id={json['anilist_id']}"
+            f"&file={quote(json['filename'])}&t={json['at']}&token={json['tokenthumb']}"
+        )
         return await (await self.aio_session.get(url)).content.read()
 
-    async def natural_preview(self, response: dict, index: int = 0, mute: bool = False) -> bytes:
+    async def natural_preview(
+        self, response: Union[dict, SuperDict], index: int = 0, mute: bool = False
+    ) -> bytes:
         """
         Video Preview with Natural Scene Cutting
         Args:
@@ -109,13 +116,17 @@ class Async_Trace:
             bytes: Video content
         """
         response = response["docs"][index]
-        url = f'{self.media_url}video/{response["anilist_id"]}/'\
-              f'{quote(response["filename"])}?t={response["at"]}&token={response["tokenthumb"]}'
+        url = (
+            f'{self.media_url}video/{response["anilist_id"]}/'
+            f'{quote(response["filename"])}?t={response["at"]}&token={response["tokenthumb"]}'
+        )
         if mute:
             url += "&mute"
         return await (await self.aio_session.get(url)).content.read()
 
-    async def image_preview(self, json: dict, index: int = 0) -> bytes:
+    async def image_preview(
+        self, json: Union[dict, SuperDict], index: int = 0
+    ) -> bytes:
         """
         Args:
            json: Python dict given by search
@@ -123,9 +134,11 @@ class Async_Trace:
         Returns:
            bytes: Video content
         """
-        return await self.create_preview(json, 'thumbnail.php', index)
+        return await self.create_preview(json, IMAGE_PREVIEW, index)
 
-    async def video_preview(self, json: dict, index: int = 0) -> bytes:
+    async def video_preview(
+        self, json: Union[dict, SuperDict], index: int = 0
+    ) -> bytes:
         """
         Args:
            json: Python dict given by search
@@ -133,4 +146,7 @@ class Async_Trace:
         Returns:
            bytes: Video content
         """
-        return await self.create_preview(json, 'preview.php', index)
+        return await self.create_preview(json, VIDEO_PREVIEW, index)
+
+
+Async_Trace = AsyncTrace

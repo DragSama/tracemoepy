@@ -1,7 +1,7 @@
 import json
 
 
-class Dict(dict):
+class SuperDict(dict):
     """
     Custom dict to access dict keys as attributes.
     """
@@ -10,17 +10,15 @@ class Dict(dict):
         super().__init__(*args, **kwargs)
 
     def to_dict(self):
-        """
-        Convert back to dict.
-        """
+        "Convert SuperDict back to dict."
         _dict = dict(self)
         for key in _dict:
-            if isinstance(_dict[key], Dict):
+            if isinstance(_dict[key], SuperDict):
                 _dict[key] = _dict[key].to_dict()
             elif isinstance(_dict[key], (list, tuple, set)):
                 new_list = []
                 for i in _dict[key]:
-                    if isinstance(i, Dict):
+                    if isinstance(i, SuperDict):
                         new_list.append(i.to_dict())
                     else:
                         new_list.append(i)
@@ -50,9 +48,9 @@ def convert_list(n: list) -> list:
     return new_list
 
 
-def convert(n: dict) -> Dict:
+def convert(n: dict) -> SuperDict:
     """
-    Convert normal dict, So you can access dict keys as attributes.
+    Convert normal dict to SuperDict, So you can access dict keys as attributes.
     Can also convert nested structures.
 
     Example:
@@ -78,4 +76,4 @@ def convert(n: dict) -> Dict:
             n[key] = convert(n[key])
         elif isinstance(n[key], (list, tuple, set)):
             n[key] = convert_list(n[key])
-    return Dict(**n)
+    return SuperDict(**n)

@@ -1,21 +1,31 @@
 """All erorrs that are raised."""
 
-class TooManyRequests(Exception):
 
-    """Raised when API Limit is reached or Too many requests in short period of time"""
+class APIError(Exception):
 
-class EntityTooLarge(Exception):
+    "Base for all errors"
+
+
+class TooManyRequests(APIError):
+
+    "Raised when API Limit is reached or Too many requests in short period of time"
+
+
+class EntityTooLarge(APIError):
 
     """Raised when image size > 10MB"""
 
-class ServerError(Exception):
 
-    """Something wrong with the trace.moe server or Image provided was malformed"""
+class ServerError(APIError):
 
-class InvalidToken(Exception):
+    "Something wrong with the trace.moe server or Image provided was malformed"
 
-    """Invalid token was provided"""
 
-class EmptyImage(Exception):
+class InvalidToken(APIError):
 
-    """Image provided was empty"""
+    "Invalid token was provided"
+
+
+class EmptyImage(APIError):
+
+    "Image provided was empty"

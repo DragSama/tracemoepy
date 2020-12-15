@@ -17,7 +17,9 @@ tracemoe = tracemoepy.tracemoe.TraceMoe()
 
 - You can search image like:
 ```python
-print(tracemoe.search('https://trace.moe/img/flipped-good.jpg', is_url = True))
+result = tracemoe.search('https://trace.moe/img/flipped-good.jpg', is_url = True)
+print(result.prettify())
+print(f'{result.docs[0].title}')
 ```
 
 - Or if you provide base64 encoded image:
@@ -46,8 +48,6 @@ import tracemoepy
 import asyncio
 tracemoe = tracemoe.asynctrace.Async_Trace()
 async def anything():
-   #return await + Anything from the above examples
-   #like:
    return await tracemoe.search('https://trace.moe/img/flipped-good.jpg', is_url = True)
 loop = asyncio.get_event_loop()
 loop.run_until_complete(anything())
