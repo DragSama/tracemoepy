@@ -2,9 +2,15 @@ from .helpers.superdict import convert, SuperDict
 from .helpers.constants import BASE_URL, BASE_MEDIA_URL, IMAGE_PREVIEW, VIDEO_PREVIEW
 from .errors import EmptyImage, InvalidToken, ServerError, TooManyRequests
 
-from typing import Union
+from typing import Union, Optional
 from base64 import b64encode
 from urllib.parse import quote
+
+
+try:
+    import ujson
+except ImportError:
+    ujson = False
 
 import aiohttp
 
@@ -13,14 +19,14 @@ class AsyncTrace:
 
     """Tracemoe class with all the stuff."""
 
-    def __init__(self, api_token: str = "", session=False):
+    def __init__(self, api_token: str="", session: Union[aiohttp.ClientSession, bool]=False):
         """Setup all urls and session."""
         self.base_url = BASE_URL
         self.media_url = BASE_MEDIA_URL
         self.api_token = api_token
         if not session:
             self.aio_session = aiohttp.ClientSession(
-                {"Content-Type": "application/json"}
+                headers = {"Content-Type": "application/json"}
             )
         else:
             self.aio_session = session
@@ -33,8 +39,11 @@ class AsyncTrace:
         """
         url = f"{self.base_url}me"
         if self.api_token:
-            url += f"?token={self.token}"
-        return convert((await (await self.aio_session.get(url)).json()))
+            url += f"?token={self.api_token}"
+        response = await self.aio_session.get(url)
+        if ujson:
+            return convert((await response.json(loads = ujson.loads)))
+        return convert((await response.json()))
 
     async def search(
         self, path: str, encode: bool = False, upload_file=False, is_url: bool = False
@@ -70,6 +79,8 @@ class AsyncTrace:
         else:
             response = await self.aio_session.post(url, json={"image": encoded})
         if response.status == 200:
+            if ujson:
+                return convert((await response.json(loads = ujson.loads)))
             return convert((await response.json()))
         elif response.status == 400:
             raise EmptyImage("Image provided was empty!")
@@ -78,7 +89,7 @@ class AsyncTrace:
         elif response.status in [500, 503]:
             raise ServerError("Image is malformed or Something went wrong")
         elif response.status == 429:
-            raise TooManyRequests(await response.text)
+            raise TooManyRequests(response.text)
         else:
             raise ServerError(f"Unknown error: {response.status}")
 

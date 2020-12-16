@@ -8,6 +8,10 @@ from urllib.parse import quote
 
 import requests
 
+try:
+    import ujson
+except ImportError:
+    ujson = False # type: ignore[no-redef]
 
 class TraceMoe:
 
@@ -27,8 +31,11 @@ class TraceMoe:
         """
         url = f"{self.base_url}me"
         if self.api_token:
-            url += f"?token={self.token}"
-        return convert(requests.get(url).json())
+            url += f"?token={self.api_token}"
+        response = requests.get(url)
+        if ujson:
+            return convert(ujson.loads(response.text))
+        return convert(response.json())
 
     def search(
         self,
@@ -66,6 +73,8 @@ class TraceMoe:
         else:
             response = requests.post(url, json={"image": encoded})
         if response.status_code == 200:
+            if ujson:
+                return convert(ujson.loads(response.text))
             return convert(response.json())
         elif response.status_code == 400:
             raise EmptyImage("Image provided was empty!")

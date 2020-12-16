@@ -1,5 +1,6 @@
 import json
 
+from typing import Tuple, List, Set, Union, Dict, Any
 
 class SuperDict(dict):
     """
@@ -9,7 +10,7 @@ class SuperDict(dict):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, Any]:
         "Convert SuperDict back to dict."
         _dict = dict(self)
         for key in _dict:
@@ -25,7 +26,7 @@ class SuperDict(dict):
                 _dict[key] = new_list
         return _dict
 
-    def prettify(self, indent=4):
+    def prettify(self, indent=4) -> str:
         """
         Shortuct for `json.dumps(output.to_dict(), indent = 4)`
         """
@@ -35,7 +36,7 @@ class SuperDict(dict):
         return self[attr]
 
 
-def convert_list(n: list) -> list:
+def convert_list(n: Union[List[Any], Tuple[Any, ...], Set[Any]]) -> List[Any]:
     "Helper function for convert()"
     new_list = []
     for item in n:
