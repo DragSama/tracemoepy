@@ -46,7 +46,7 @@ with open('preview.mp4', 'wb') as f:
 ```python
 import tracemoepy
 import asyncio
-tracemoe = tracemoe.asynctrace.Async_Trace()
+tracemoe = tracemoepy.async_trace.Async_Trace()
 async def anything():
    return await tracemoe.search('https://trace.moe/img/flipped-good.jpg', is_url = True)
 loop = asyncio.get_event_loop()
