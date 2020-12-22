@@ -2,8 +2,7 @@
 from .helpers import *
 from .errors import *
 from .tracemoe import TraceMoe
-from .async_trace import Async_Trace
+from .async_trace import Async_Trace, AsyncTrace
 
 __author__ = ["DragSama"]
 __version__ = 3.6
-

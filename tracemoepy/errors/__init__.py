@@ -25,7 +25,10 @@ class InvalidToken(APIError):
 
     "Invalid token was provided"
 
-
 class EmptyImage(APIError):
 
     "Image provided was empty"
+
+class InvalidPath(Exception):
+
+    "Given path doesn't exist."

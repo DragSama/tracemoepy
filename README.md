@@ -30,29 +30,42 @@ print(tracemoe.search(image, encode=False))
 ```python
 print(tracemoe.search('a.jpg', encode=True))
 ```
-- Video Preview (Gives content):
+- Natural Preview:
 ```python
 output = tracemoe.search('https://trace.moe/img/flipped-good.jpg', is_url = True)
-tracemoe.natural_preview(output)
+output.docs[0].save('preview.mp4', mute = False) # True for silent
 ```
-- Save video preview
+- Save Natural preview (Method 2)
 ```python
 output = tracemoe.search('https://trace.moe/img/flipped-good.jpg', is_url = True)
 video = tracemoe.natural_preview(output)
 with open('preview.mp4', 'wb') as f:
   f.write(video)
 ```
-- Image Preview:
+- Save Image Preview
+```python
+from tracemoepy.helpers.constants import IMAGE_PREVIEW
+output = tracemoe.search('https://trace.moe/img/flipped-good.jpg', is_url = True)
+output.docs[0].save(save_path = 'preview.png', preview_path = IMAGE_PREVIEW)
+```
+- Image Preview (Method 2)
 ```python
 output = tracemoe.search('https://trace.moe/img/flipped-good.jpg', is_url = True)
-tracemoe.image_preview(output)
+tracemoe.image_preview(output) # Gives content
 ```
-
+- You can do help(method_name) to get more info about the given method
+```python
+help(tracemoe.search)
+```
 ## Asyncio
 ```python
 import tracemoepy
 import asyncio
-tracemoe = tracemoe.asynctrace.Async_Trace()
+# It recommended is you provide your own aiohttp session as
+# tracemoepy will NOT close the session, You can access the session
+# like: tracemoe.aio_session, To provide own aiohttp session you can just do
+# tracemoe.AsyncTrace(session = your_session)
+tracemoe = tracemoepy.AsyncTrace()
 async def anything():
    return await tracemoe.search('https://trace.moe/img/flipped-good.jpg', is_url = True)
 loop = asyncio.get_event_loop()
@@ -65,6 +78,7 @@ loop.run_until_complete(anything())
 - `ServerError`: Raised when Something wrong with the trace.moe server or Image provided was malformed.
 - `InvalidToken`: Raised when Invalid token was provided.
 - `EmptyImage`: Raised when Image provided was empty.
+- `InvalidPath`: Invalid path was given, This is only raised by `.save(...)` method
 - All these errors are located at tracemoepy.errors, Example of handling Exception:
 ```python
 from tracemoepy.errors import TooManyRequests

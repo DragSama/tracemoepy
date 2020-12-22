@@ -1,23 +1,57 @@
 from .helpers.superdict import convert, SuperDict
 from .helpers.constants import BASE_URL, BASE_MEDIA_URL, IMAGE_PREVIEW, VIDEO_PREVIEW
-from .errors import EmptyImage, InvalidToken, ServerError, TooManyRequests
+from .errors import EmptyImage, InvalidToken, ServerError, TooManyRequests, InvalidPath
 
-from typing import Union
+from typing import Union, Optional
 from base64 import b64encode
 from urllib.parse import quote
 
 import requests
+import types
 
 try:
     import ujson
 except ImportError:
-    ujson = False # type: ignore[no-redef]
+    ujson = False
+
+def save(self, save_path: str, preview_path: Optional[str] = None, mute: bool = False):
+    """
+    Save preview in given location
+    Args:
+        save_path: Path to save preview
+        preview_path: None for natural preview, Otherwise preview.php or thumbnail.php, Defaults to None
+        mute: Mute natural preview, Defaults to False
+    Raises:
+        ServerError: Failed to create preview
+        InvalidPath: Preview path given doesn't exist on tracemoe servers
+    """
+    json = self
+    if preview_path:
+        url = (
+            f"{BASE_URL}{preview_path}?anilist_id={json['anilist_id']}"
+            f"&file={quote(json['filename'])}&t={json['at']}&token={json['tokenthumb']}"
+        )
+    else:
+        url = (
+            f'{BASE_MEDIA_URL}video/{json["anilist_id"]}/'
+            f'{quote(json["filename"])}?t={json["at"]}&token={json["tokenthumb"]}'
+        )
+        if mute:
+            url += "&mute"
+    response = requests.get(url)
+    if response.status_code in [500, 503]:
+        raise ServerError("Image is malformed or Something went wrong")
+    elif response.status_code in [404]:
+        raise InvalidPath(f"Path {preview_path} doesn't exist on {BASE_URL}.")
+    with open(save_path, 'wb') as file:
+        file.write(response.content)
+    return True
 
 class TraceMoe:
 
     """Tracemoe class with all the stuff."""
 
-    def __init__(self, api_token: str = ""):
+    def __init__(self, api_token: str = "") -> None:
         """Setup all vars."""
         self.base_url = BASE_URL
         self.media_url = BASE_MEDIA_URL
@@ -74,8 +108,12 @@ class TraceMoe:
             response = requests.post(url, json={"image": encoded})
         if response.status_code == 200:
             if ujson:
-                return convert(ujson.loads(response.text))
-            return convert(response.json())
+                json = convert(ujson.loads(response.text))
+            else:
+                json = convert(response.json())
+            for entry in json.docs:
+                entry.save = types.MethodType(save, entry)
+            return json
         elif response.status_code == 400:
             raise EmptyImage("Image provided was empty!")
         elif response.status_code == 403:
@@ -103,7 +141,11 @@ class TraceMoe:
             f"{self.base_url}{path}?anilist_id={json['anilist_id']}"
             f"&file={quote(json['filename'])}&t={json['at']}&token={json['tokenthumb']}"
         )
-        return requests.get(url).content
+        response = requests.get(url)
+        if response.status_code in [500, 503]:
+            raise ServerError("Image is malformed or Something went wrong")
+        else:
+            return response.content
 
     def image_preview(self, json: Union[dict, SuperDict], index: int = 0) -> bytes:
         """

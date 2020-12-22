@@ -1,6 +1,6 @@
 from .helpers.superdict import convert, SuperDict
 from .helpers.constants import BASE_URL, BASE_MEDIA_URL, IMAGE_PREVIEW, VIDEO_PREVIEW
-from .errors import EmptyImage, InvalidToken, ServerError, TooManyRequests
+from .errors import EmptyImage, InvalidToken, ServerError, TooManyRequests, InvalidPath
 
 from typing import Union, Optional
 from base64 import b64encode
@@ -13,7 +13,41 @@ except ImportError:
     ujson = False
 
 import aiohttp
+import types
 
+
+async def save(self, save_path: str, preview_path: Optional[str] = None, mute: bool = False):
+    """
+    Save preview in given location
+    Args:
+        save_path: Path to save preview
+        preview_path: None for natural preview, Otherwise preview.php or thumbnail.php, Defaults to None
+        mute: Mute natural preview, Defaults to False
+    Raises:
+        ServerError: Failed to create preview
+        InvalidPath: Preview path given doesn't exist on tracemoe servers
+    """
+    json = self
+    if preview_path:
+        url = (
+            f"{BASE_URL}{preview_path}?anilist_id={json['anilist_id']}"
+            f"&file={quote(json['filename'])}&t={json['at']}&token={json['tokenthumb']}"
+        )
+    else:
+        url = (
+            f'{BASE_MEDIA_URL}video/{json["anilist_id"]}/'
+            f'{quote(json["filename"])}?t={json["at"]}&token={json["tokenthumb"]}'
+        )
+        if mute:
+            url += "&mute"
+    response = await self.aio_session.get(url)
+    if response.status in [500, 503]:
+        raise ServerError("Image is malformed or Something went wrong")
+    elif response.status in [404]:
+        raise InvalidPath(f"Path {preview_path} doesn't exist on {BASE_URL}.")
+    with open(save_path, 'wb') as file:
+        file.write((await response.content.read()))
+    return True
 
 class AsyncTrace:
 
@@ -80,8 +114,13 @@ class AsyncTrace:
             response = await self.aio_session.post(url, json={"image": encoded})
         if response.status == 200:
             if ujson:
-                return convert((await response.json(loads = ujson.loads)))
-            return convert((await response.json()))
+                json = convert((await response.json(loads = ujson.loads)))
+            else:
+                json = convert((await response.json()))
+            for entry in json.docs:
+                entry.aio_session = self.aio_session
+                entry.save = types.MethodType(save, entry)
+            return json
         elif response.status == 400:
             raise EmptyImage("Image provided was empty!")
         elif response.status == 403:
