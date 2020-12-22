@@ -14,7 +14,7 @@ from tracemoepy.helpers.constants import IMAGE_PREVIEW
 
 class test_tracemoe(unittest.TestCase):
 
-    def test_search(self):
+    def test_a_search(self):
 
         tracemoe = TraceMoe()
 
@@ -28,7 +28,7 @@ class test_tracemoe(unittest.TestCase):
         #result = tracemoe.search('flipped-good.webp', encode = True)
         #self.assertIsInstance(result, SuperDict)
 
-    def test_natural_preview(self):
+    def test_b_natural_preview(self):
 
         tracemoe = TraceMoe()
         result = tracemoe.search('https://trace.moe/img/flipped-good.jpg', is_url = True)
@@ -44,7 +44,7 @@ class test_tracemoe(unittest.TestCase):
         self.assertEqual(preview, True)
         self.assertEqual(os.path.exists('natural-preview-silent.mp4'), True)
 
-    def test_image_preview(self):
+    def test_c_image_preview(self):
         tracemoe = TraceMoe()
         result = tracemoe.search('https://trace.moe/img/flipped-good.jpg', is_url = True)
 
@@ -55,7 +55,7 @@ class test_tracemoe(unittest.TestCase):
         self.assertEqual(preview, True)
         self.assertEqual(os.path.exists('image-preview.png'), True)
 
-    def test_errors(self):
+    def test_d_errors(self):
         tracemoe = TraceMoe(api_token = 'spfskjapofapokfapkf')
         with self.assertRaises(InvalidToken):
             tracemoe.get_me()
