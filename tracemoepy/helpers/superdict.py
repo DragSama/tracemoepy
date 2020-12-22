@@ -28,9 +28,9 @@ class SuperDict(dict):
 
     def prettify(self, indent=4) -> str:
         """
-        Shortuct for `json.dumps(output.to_dict(), indent = 4)`
+        Shortuct for `json.dumps(output.to_dict(), indent = 4, ensure_ascii = False)`
         """
-        return json.dumps(self.to_dict(), indent=indent)
+        return json.dumps(self.to_dict(), indent=indent, ensure_ascii = False)
 
     def __getattr__(self, attr):
         return self[attr]

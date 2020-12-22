@@ -33,15 +33,21 @@ print(tracemoe.search('a.jpg', encode=True))
 - Video Preview (Gives content):
 ```python
 output = tracemoe.search('https://trace.moe/img/flipped-good.jpg', is_url = True)
-tracemoe.video_preview(output)
+tracemoe.natural_preview(output)
 ```
 - Save video preview
 ```python
 output = tracemoe.search('https://trace.moe/img/flipped-good.jpg', is_url = True)
-video = tracemoe.video_preview(output)
+video = tracemoe.natural_preview(output)
 with open('preview.mp4', 'wb') as f:
   f.write(video)
 ```
+- Image Preview:
+```python
+output = tracemoe.search('https://trace.moe/img/flipped-good.jpg', is_url = True)
+tracemoe.image_preview(output)
+```
+
 ## Asyncio
 ```python
 import tracemoepy

@@ -29,7 +29,7 @@ class TraceMoe:
         Returns:
           SuperDict: response from server
         """
-        url = f"{self.base_url}me"
+        url = f"{self.base_url}api/me"
         if self.api_token:
             url += f"?token={self.api_token}"
         response = requests.get(url)
