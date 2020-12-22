@@ -14,6 +14,7 @@ try:
 except ImportError:
     ujson = False
 
+
 def save(self, save_path: str, preview_path: Optional[str] = None, mute: bool = False):
     """
     Save preview in given location
@@ -43,9 +44,10 @@ def save(self, save_path: str, preview_path: Optional[str] = None, mute: bool = 
         raise ServerError("Image is malformed or Something went wrong")
     elif response.status_code in [404]:
         raise InvalidPath(f"Path {preview_path} doesn't exist on {BASE_URL}.")
-    with open(save_path, 'wb') as file:
+    with open(save_path, "wb") as file:
         file.write(response.content)
     return True
+
 
 class TraceMoe:
 

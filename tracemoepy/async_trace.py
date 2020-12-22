@@ -16,7 +16,9 @@ import aiohttp
 import types
 
 
-async def save(self, save_path: str, preview_path: Optional[str] = None, mute: bool = False):
+async def save(
+    self, save_path: str, preview_path: Optional[str] = None, mute: bool = False
+):
     """
     Save preview in given location
     Args:
@@ -45,22 +47,25 @@ async def save(self, save_path: str, preview_path: Optional[str] = None, mute: b
         raise ServerError("Image is malformed or Something went wrong")
     elif response.status in [404]:
         raise InvalidPath(f"Path {preview_path} doesn't exist on {BASE_URL}.")
-    with open(save_path, 'wb') as file:
+    with open(save_path, "wb") as file:
         file.write((await response.content.read()))
     return True
+
 
 class AsyncTrace:
 
     """Tracemoe class with all the stuff."""
 
-    def __init__(self, api_token: str="", session: Union[aiohttp.ClientSession, bool]=False):
+    def __init__(
+        self, api_token: str = "", session: Union[aiohttp.ClientSession, bool] = False
+    ):
         """Setup all urls and session."""
         self.base_url = BASE_URL
         self.media_url = BASE_MEDIA_URL
         self.api_token = api_token
         if not session:
             self.aio_session = aiohttp.ClientSession(
-                headers = {"Content-Type": "application/json"}
+                headers={"Content-Type": "application/json"}
             )
         else:
             self.aio_session = session
@@ -76,7 +81,7 @@ class AsyncTrace:
             url += f"?token={self.api_token}"
         response = await self.aio_session.get(url)
         if ujson:
-            return convert((await response.json(loads = ujson.loads)))
+            return convert((await response.json(loads=ujson.loads)))
         return convert((await response.json()))
 
     async def search(
@@ -114,7 +119,7 @@ class AsyncTrace:
             response = await self.aio_session.post(url, json={"image": encoded})
         if response.status == 200:
             if ujson:
-                json = convert((await response.json(loads = ujson.loads)))
+                json = convert((await response.json(loads=ujson.loads)))
             else:
                 json = convert((await response.json()))
             for entry in json.docs:

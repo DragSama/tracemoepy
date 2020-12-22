@@ -2,6 +2,7 @@ import json
 
 from typing import Tuple, List, Set, Union, Dict, Any
 
+
 class SuperDict(dict):
     """
     Custom dict to access dict keys as attributes.
@@ -30,7 +31,7 @@ class SuperDict(dict):
         """
         Shortuct for `json.dumps(output.to_dict(), indent = 4, ensure_ascii = False)`
         """
-        return json.dumps(self.to_dict(), indent=indent, ensure_ascii = False)
+        return json.dumps(self.to_dict(), indent=indent, ensure_ascii=False)
 
     def __getattr__(self, attr):
         return self[attr]
