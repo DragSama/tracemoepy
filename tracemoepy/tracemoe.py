@@ -110,7 +110,7 @@ class TraceMoe:
                 encoded = b64encode(f.read()).decode("utf-8")
                 response = requests.post(url, json={"image": encoded})
         else:
-            response = requests.post(url, json={"image": encoded})
+            response = requests.post(url, json={"image": path})
         if response.status_code == 200:
             if ujson:
                 json = convert(ujson.loads(response.text))
