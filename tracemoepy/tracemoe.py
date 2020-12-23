@@ -69,6 +69,8 @@ class TraceMoe:
         if self.api_token:
             url += f"?token={self.api_token}"
         response = requests.get(url)
+        if response.status_code == 403:
+            raise InvalidToken("You are using Invalid token!")
         if ujson:
             return convert(ujson.loads(response.text))
         return convert(response.json())
@@ -101,13 +103,14 @@ class TraceMoe:
         if is_url:
             response = requests.get(url, params={"url": path})
         elif upload_file:
-            response = requests.post(url, files={"image": open(path, "rb")})
+            with open(path, "rb") as f:
+                response = requests.post(url, files={"image": f})
         elif encode:
             with open(path, "rb") as f:
                 encoded = b64encode(f.read()).decode("utf-8")
                 response = requests.post(url, json={"image": encoded})
         else:
-            response = requests.post(url, json={"image": encoded})
+            response = requests.post(url, json={"image": path})
         if response.status_code == 200:
             if ujson:
                 json = convert(ujson.loads(response.text))
@@ -188,4 +191,8 @@ class TraceMoe:
         )
         if mute:
             url += "&mute"
-        return requests.get(url).content
+        response = requests.get(url)
+        if response.status_code in [500, 503]:
+            raise ServerError("Image is malformed or Something went wrong")
+        else:
+            return response.content
