@@ -4,6 +4,8 @@
 
 [![PyPI version](https://img.shields.io/pypi/v/tracemoepy?color=bright-green)](https://pypi.org/project/tracemoepy/)
 [![Downloads](https://img.shields.io/pypi/dd/tracemoepy)](https://pypi.org/project/tracemoepy/)
+[![Github Actions](https://github.com/DragSama/tracemoepy/workflows/Github%20Actions/badge.svg)](https://github.com/DragSama/tracemoepy/actions)
+[![Code style](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 # Install
 - Install using pip: `pip install tracemoepy`
