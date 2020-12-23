@@ -10,6 +10,7 @@ tracemoe = TraceMoe()
 
 
 def test_search():
+    assert os.path.exists("flipped-good.webp")
 
     result = tracemoe.search("https://trace.moe/img/flipped-good.jpg", is_url=True)
     assert isinstance(result, SuperDict)
@@ -71,7 +72,3 @@ def test_d_errors():
 
     with pytest.raises(InvalidPath):
         result.docs[0].save("preview.mp4", preview_path="/non-existant-path")
-
-
-if __name__ == "__main__":
-    unittest.main()

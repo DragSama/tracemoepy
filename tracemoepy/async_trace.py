@@ -80,6 +80,8 @@ class AsyncTrace:
         if self.api_token:
             url += f"?token={self.api_token}"
         response = await self.aio_session.get(url)
+        if response.status == 403:
+            raise InvalidToken("You are using Invalid token!")
         if ujson:
             return convert((await response.json(loads=ujson.loads)))
         return convert((await response.json()))
@@ -108,15 +110,16 @@ class AsyncTrace:
         if is_url:
             response = await self.aio_session.get(url, params={"url": path})
         elif upload_file:
-            response = await self.aio_session.post(
-                url, data={"image": open(path, "rb")}
-            )
+            with open(path, "rb") as file:
+                response = await self.aio_session.post(
+                    url, data={"image": file}
+                )
         elif encode:
             with open(path, "rb") as f:
                 encoded = b64encode(f.read()).decode("utf-8")
                 response = await self.aio_session.post(url, json={"image": encoded})
         else:
-            response = await self.aio_session.post(url, json={"image": encoded})
+            response = await self.aio_session.post(url, json={"image": path})
         if response.status == 200:
             if ujson:
                 json = convert((await response.json(loads=ujson.loads)))
