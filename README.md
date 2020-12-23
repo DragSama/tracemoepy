@@ -1,5 +1,6 @@
 # TraceMoePY
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/aaed48cb31674d86b9e1355d8b78f855)](https://app.codacy.com/gh/DragSama/tracemoepy?utm_source=github.com&utm_medium=referral&utm_content=DragSama/tracemoepy&utm_campaign=Badge_Grade)
 [![PyPI version](https://img.shields.io/pypi/v/tracemoepy?color=bright-green)](https://pypi.org/project/tracemoepy/)
 [![Downloads](https://img.shields.io/pypi/dd/tracemoepy)](https://pypi.org/project/tracemoepy/)
 [![Github Actions](https://github.com/DragSama/tracemoepy/workflows/Github%20Actions/badge.svg)](https://github.com/DragSama/tracemoepy/actions)
