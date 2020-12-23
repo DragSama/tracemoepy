@@ -16,6 +16,7 @@ except ImportError:
 
 
 def save(self, save_path: str, preview_path: Optional[str] = None, mute: bool = False):
+
     """
     Save preview in given location
     Args:
@@ -26,6 +27,7 @@ def save(self, save_path: str, preview_path: Optional[str] = None, mute: bool = 
         ServerError: Failed to create preview
         InvalidPath: Preview path given doesn't exist on tracemoe servers
     """
+
     json = self
     if preview_path:
         url = (
@@ -50,7 +52,6 @@ def save(self, save_path: str, preview_path: Optional[str] = None, mute: bool = 
 
 
 class TraceMoe:
-
     """Tracemoe class with all the stuff."""
 
     def __init__(self, api_token: str = "") -> None:
@@ -160,7 +161,7 @@ class TraceMoe:
         Returns:
            bytes: Video content
         """
-        return self.create_preview(json, "thumbnail.php", index)
+        return self.create_preview(json, IMAGE_PREVIEW, index)
 
     def video_preview(self, json: Union[dict, SuperDict], index: int = 0) -> bytes:
         """
@@ -170,7 +171,7 @@ class TraceMoe:
         Returns:
            bytes: Video content
         """
-        return self.create_preview(json, "preview.php", index)
+        return self.create_preview(json, VIDEO_PREVIEW, index)
 
     def natural_preview(
         self, response: Union[dict, SuperDict], index: int = 0, mute: bool = False
