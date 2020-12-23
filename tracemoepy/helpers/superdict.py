@@ -4,11 +4,10 @@ from typing import Tuple, List, Set, Union, Dict, Any
 
 
 class SuperDict(dict):
-    """
-    Custom dict to access dict keys as attributes.
-    """
+    """Custom dict to access dict keys as attributes."""
 
     def __init__(self, *args, **kwargs):
+        """Initialize a dict"""
         super().__init__(*args, **kwargs)
 
     def to_dict(self) -> Dict[str, Any]:
@@ -28,17 +27,16 @@ class SuperDict(dict):
         return _dict
 
     def prettify(self, indent=4) -> str:
-        """
-        Shortuct for `json.dumps(output.to_dict(), indent = 4, ensure_ascii = False)`
-        """
+        """Shortuct for `json.dumps(output.to_dict(), indent = 4, ensure_ascii = False)`"""
         return json.dumps(self.to_dict(), indent=indent, ensure_ascii=False)
 
     def __getattr__(self, attr):
+        """Return self[attr]"""
         return self[attr]
 
 
 def convert_list(n: Union[List[Any], Tuple[Any, ...], Set[Any]]) -> List[Any]:
-    "Helper function for convert()"
+    """Helper function for convert()"""
     new_list = []
     for item in n:
         if isinstance(item, (list, tuple, set)):
