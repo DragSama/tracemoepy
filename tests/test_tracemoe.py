@@ -3,7 +3,6 @@ import pytest
 
 from tracemoepy import TraceMoe
 from tracemoepy.errors import InvalidToken, ServerError, InvalidPath
-from tracemoepy.helpers.superdict import SuperDict
 from tracemoepy.helpers.constants import IMAGE_PREVIEW
 
 from attrify import Attrify
