@@ -10,7 +10,7 @@ from attrify import Attrify
 
 pytestmark = pytest.mark.asyncio
 
-assert s.path.exists("flipped-good.webp")
+assert os.path.exists("flipped-good.webp")
 
 async def test_a_intializing():
 
