@@ -23,6 +23,6 @@ setuptools.setup(
         "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
         "Operating System :: OS Independent",
     ],
-    install_requires=["requests", "aiohttp[speedups]"],
+    install_requires=["requests", "aiohttp[speedups]", "attrify"],
     python_requires=">=3.6",
 )
