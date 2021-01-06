@@ -6,6 +6,8 @@ from tracemoepy.errors import InvalidToken, ServerError, InvalidPath
 from tracemoepy.helpers.superdict import SuperDict
 from tracemoepy.helpers.constants import IMAGE_PREVIEW
 
+from attrify import Attrify
+
 tracemoe = TraceMoe()
 
 
@@ -13,10 +15,10 @@ def test_search():
     assert os.path.exists("flipped-good.webp")
 
     result = tracemoe.search("https://trace.moe/img/flipped-good.jpg", is_url=True)
-    assert isinstance(result, SuperDict)
+    assert isinstance(result, Attrify)
 
     result = tracemoe.search("flipped-good.webp", upload_file=True)
-    assert isinstance(result, SuperDict)
+    assert isinstance(result, Attrify)
     # Not testing because tracemoe is having issues with base64 encoded images.
     # result = tracemoe.search('flipped-good.webp', encode = True)
     # assert isinstance(result, SuperDict)

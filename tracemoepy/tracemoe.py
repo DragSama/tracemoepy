@@ -1,10 +1,11 @@
-from .helpers.superdict import convert, SuperDict
 from .helpers.constants import BASE_URL, BASE_MEDIA_URL, IMAGE_PREVIEW, VIDEO_PREVIEW
 from .errors import EmptyImage, InvalidToken, ServerError, TooManyRequests, InvalidPath
 
 from typing import Union, Optional
 from base64 import b64encode
 from urllib.parse import quote
+
+from attrify import Attrify
 
 import requests
 import types
@@ -60,11 +61,11 @@ class TraceMoe:
         self.media_url = BASE_MEDIA_URL
         self.api_token = api_token
 
-    def get_me(self) -> SuperDict:
+    def get_me(self) -> Attrify:
         """
         Lets you check the search quota and limit for your account (or IP address).
         Returns:
-          SuperDict: response from server
+          Attrify: response from server
         """
         url = f"{self.base_url}api/me"
         if self.api_token:
@@ -73,8 +74,8 @@ class TraceMoe:
         if response.status_code == 403:
             raise InvalidToken("You are using Invalid token!")
         if ujson:
-            return convert(ujson.loads(response.text))
-        return convert(response.json())
+            return Attrify(ujson.loads(response.text))
+        return Attrify(response.json())
 
     def search(
         self,
@@ -82,7 +83,7 @@ class TraceMoe:
         encode: bool = False,
         is_url: bool = False,
         upload_file: bool = False,
-    ) -> SuperDict:
+    ) -> Attrify:
         """
         Args:
            path: Image url or Img file name or base64 encoded Image or Image path
@@ -90,7 +91,7 @@ class TraceMoe:
            is_url: Treat the path as a url or not
            upload_file: Upload file
         Returns:
-           SuperDict: response from server
+           Attrify: response from server
         Raises:
            EmptyImage: Raised If Image Is empty
            InvalidToken: Raised when token provided Is Invalid
@@ -114,9 +115,9 @@ class TraceMoe:
             response = requests.post(url, json={"image": path})
         if response.status_code == 200:
             if ujson:
-                json = convert(ujson.loads(response.text))
+                json = Attrify(ujson.loads(response.text))
             else:
-                json = convert(response.json())
+                json = Attrify(response.json())
             for entry in json.docs:
                 entry.save = types.MethodType(save, entry)
             return json
@@ -153,7 +154,7 @@ class TraceMoe:
         else:
             return response.content
 
-    def image_preview(self, json: Union[dict, SuperDict], index: int = 0) -> bytes:
+    def image_preview(self, json: Union[dict, Attrify], index: int = 0) -> bytes:
         """
         Args:
            json: Python dict given by search
@@ -163,7 +164,7 @@ class TraceMoe:
         """
         return self.create_preview(json, IMAGE_PREVIEW, index)
 
-    def video_preview(self, json: Union[dict, SuperDict], index: int = 0) -> bytes:
+    def video_preview(self, json: Union[dict, Attrify], index: int = 0) -> bytes:
         """
         Args:
            json: Python dict given by search
@@ -174,7 +175,7 @@ class TraceMoe:
         return self.create_preview(json, VIDEO_PREVIEW, index)
 
     def natural_preview(
-        self, response: Union[dict, SuperDict], index: int = 0, mute: bool = False
+        self, response: Union[dict, Attrify], index: int = 0, mute: bool = False
     ) -> bytes:
         """
         Video Preview with Natural Scene Cutting

@@ -4,11 +4,13 @@ import aiohttp
 
 from tracemoepy import AsyncTrace
 from tracemoepy.errors import InvalidToken, ServerError, InvalidPath
-from tracemoepy.helpers.superdict import SuperDict
 from tracemoepy.helpers.constants import IMAGE_PREVIEW
 
+from attrify import Attrify
+
 pytestmark = pytest.mark.asyncio
-print(os.path.exists("flipped-good.webp"))
+
+assert s.path.exists("flipped-good.webp")
 
 async def test_a_intializing():
 
@@ -26,7 +28,7 @@ async def test_b_search():
     tracemoe = AsyncTrace()
 
     result = await tracemoe.search("https://trace.moe/img/flipped-good.jpg", is_url=True)
-    assert isinstance(result, SuperDict)
+    assert isinstance(result, Attrify)
 
     # Don't ask why.
     # result = await tracemoe.search("flipped-good.webp", upload_file=True)

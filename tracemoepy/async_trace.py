@@ -1,4 +1,3 @@
-from .helpers.superdict import convert, SuperDict
 from .helpers.constants import BASE_URL, BASE_MEDIA_URL, IMAGE_PREVIEW, VIDEO_PREVIEW
 from .errors import EmptyImage, InvalidToken, ServerError, TooManyRequests, InvalidPath
 
@@ -6,6 +5,7 @@ from typing import Union, Optional
 from base64 import b64encode
 from urllib.parse import quote
 
+from attrify import Attrify
 
 try:
     import ujson
@@ -70,7 +70,7 @@ class AsyncTrace:
         else:
             self.aio_session = session
 
-    async def get_me(self) -> SuperDict:
+    async def get_me(self) -> Attrify:
         """
         Lets you check the search quota and limit for your account (or IP address).
         Returns:
@@ -83,12 +83,12 @@ class AsyncTrace:
         if response.status == 403:
             raise InvalidToken("You are using Invalid token!")
         if ujson:
-            return convert((await response.json(loads=ujson.loads)))
-        return convert((await response.json()))
+            return Attrify((await response.json(loads=ujson.loads)))
+        return Attrify((await response.json()))
 
     async def search(
         self, path: str, encode: bool = False, upload_file=False, is_url: bool = False
-    ) -> SuperDict:
+    ) -> Attrify:
         """
         Args:
            path: Image url or Img file name or base64 encoded Image or Image path
@@ -96,7 +96,7 @@ class AsyncTrace:
            is_url: Treat the path as a url or not
            upload_file: Upload file
         Returns:
-           SuperDict: response from server
+           Attrify: response from server
         Raises:
            EmptyImage: Raised If Image Is empty
            InvalidToken: Raised when token provided Is Invalid
@@ -122,9 +122,9 @@ class AsyncTrace:
             response = await self.aio_session.post(url, json={"image": path})
         if response.status == 200:
             if ujson:
-                json = convert((await response.json(loads=ujson.loads)))
+                json = Attrify((await response.json(loads=ujson.loads)))
             else:
-                json = convert((await response.json()))
+                json = Attrify((await response.json()))
             for entry in json.docs:
                 entry.aio_session = self.aio_session
                 entry.save = types.MethodType(save, entry)
@@ -142,7 +142,7 @@ class AsyncTrace:
 
     async def create_preview(
         self,
-        json: Union[dict, SuperDict],
+        json: Union[dict, Attrify],
         path: str,
         index: int = 0,
     ) -> bytes:
@@ -162,7 +162,7 @@ class AsyncTrace:
         return await (await self.aio_session.get(url)).content.read()
 
     async def natural_preview(
-        self, response: Union[dict, SuperDict], index: int = 0, mute: bool = False
+        self, response: Union[dict, Attrify], index: int = 0, mute: bool = False
     ) -> bytes:
         """
         Video Preview with Natural Scene Cutting
@@ -183,7 +183,7 @@ class AsyncTrace:
         return await (await self.aio_session.get(url)).content.read()
 
     async def image_preview(
-        self, json: Union[dict, SuperDict], index: int = 0
+        self, json: Union[dict, Attrify], index: int = 0
     ) -> bytes:
         """
         Args:
@@ -195,7 +195,7 @@ class AsyncTrace:
         return await self.create_preview(json, IMAGE_PREVIEW, index)
 
     async def video_preview(
-        self, json: Union[dict, SuperDict], index: int = 0
+        self, json: Union[dict, Attrify], index: int = 0
     ) -> bytes:
         """
         Args:
