@@ -133,7 +133,7 @@ class TraceMoe:
             raise ServerError(f"Unknown error: {response.status_code}")
 
     def create_preview(
-        self, json: Union[dict, SuperDict], path: str, index: int = 0
+        self, json: Union[dict, Attrify], path: str, index: int = 0
     ) -> bytes:
         """
         Args:

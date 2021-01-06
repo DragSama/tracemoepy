@@ -20,7 +20,7 @@ def test_search():
     assert isinstance(result, Attrify)
     # Not testing because tracemoe is having issues with base64 encoded images.
     # result = tracemoe.search('flipped-good.webp', encode = True)
-    # assert isinstance(result, SuperDict)
+    # assert isinstance(result, Attrify)
 
 
 def test_b_natural_preview():

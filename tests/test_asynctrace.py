@@ -32,11 +32,11 @@ async def test_b_search():
 
     # Don't ask why.
     # result = await tracemoe.search("flipped-good.webp", upload_file=True)
-    # assert isinstance(result, SuperDict)
+    # assert isinstance(result, Attrify)
 
     # Not testing because tracemoe is having issues with base64 encoded images.
     # result = tracemoe.search('flipped-good.webp', encode = True)
-    # assert isinstance(result, SuperDict)
+    # assert isinstance(result, Attrify)
 
     await tracemoe.aio_session.close()
 

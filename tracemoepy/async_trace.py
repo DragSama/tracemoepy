@@ -74,7 +74,7 @@ class AsyncTrace:
         """
         Lets you check the search quota and limit for your account (or IP address).
         Returns:
-          SuperDict: response from server
+          Attrify: response from server
         """
         url = f"{self.base_url}api/me"
         if self.api_token:
