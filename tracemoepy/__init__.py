@@ -5,4 +5,4 @@ from .tracemoe import TraceMoe
 from .async_trace import Async_Trace, AsyncTrace
 
 __author__ = ["DragSama"]
-__version__ = 3.6
+__version__ = 3.7
