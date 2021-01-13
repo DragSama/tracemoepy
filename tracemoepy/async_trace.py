@@ -207,7 +207,7 @@ class AsyncTrace:
         return await self.create_preview(json, VIDEO_PREVIEW, index)
     
     async def __aenter__(self):
-        pass
+        return self
 
     async def __aexit__(self, *args, **kwargs):
         await self.aio_session.close()
