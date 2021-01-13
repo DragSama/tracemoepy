@@ -16,20 +16,20 @@ import tracemoepy
 tracemoe = tracemoepy.tracemoe.TraceMoe()
 ```
 
-- You can search image like:
+- Search image using url:
 ```python
 result = tracemoe.search('https://trace.moe/img/flipped-good.jpg', is_url = True)
 print(result.prettify())
-print(f'{result.docs[0].title}')
+print(f"Match: {resp.docs[0].anime}\nSimilarity: {resp.docs[0].similarity*100}")
 ```
 
-- Or if you provide base64 encoded image:
+- Or If you provide base64 encoded image:
 ```python
 print(tracemoe.search(image, encode=False))
 ```
-- Or if you want to just provide the image, The wrapper will encode image using base64:
+- Or just file path:
 ```python
-print(tracemoe.search('a.jpg', encode=True))
+print(tracemoe.search('image.jpg', upload_file=True))
 ```
 - Natural Preview:
 ```python
@@ -59,19 +59,24 @@ tracemoe.image_preview(output) # Gives content
 help(tracemoe.search)
 ```
 #### Asyncio
+**All the examples below assume you are running this inside a async function**
+
+- Basic search (AioHttp session is not closed, You can access it as .aio_session)
 ```python
 import tracemoepy
-import asyncio
-# It recommended is you provide your own aiohttp session as
-# tracemoepy will NOT close the session, You can access the session
-# like: tracemoe.aio_session, To provide own aiohttp session you can just do
-# tracemoe.AsyncTrace(session = your_session)
 tracemoe = tracemoepy.AsyncTrace()
-async def anything():
-   return await tracemoe.search('https://trace.moe/img/flipped-good.jpg', is_url = True)
-loop = asyncio.get_event_loop()
-loop.run_until_complete(anything())
+resp = await tracemoe.search('https://trace.moe/img/flipped-good.jpg', is_url = True)
+print(f"Match: {resp.docs[0].anime}\nSimilarity: {resp.docs[0].similarity*100}")
 ```   
+
+- Auto close session
+```python
+import tracemoepy
+async with tracemoepy.AsyncTrace() as tracemoe:
+  resp = await tracemoe.search('https://trace.moe/img/flipped-good.jpg', is_url = True)
+  print(f"Match: {resp.docs[0].anime}\nSimilarity: {resp.docs[0].similarity*100}")
+
+```
 #### Errors
 
   - `TooManyRequests`: Raised when API Limit is reached or Too many requests in short period of time.
