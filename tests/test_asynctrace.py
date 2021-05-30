@@ -1,7 +1,8 @@
 import os
 import pytest
 import aiohttp
-import tracemoepy
+import asyncio
+
 from tracemoepy import AsyncTrace
 from tracemoepy.errors import InvalidToken, ServerError, InvalidPath
 from tracemoepy.helpers.constants import IMAGE_PREVIEW
@@ -9,7 +10,6 @@ from tracemoepy.helpers.constants import IMAGE_PREVIEW
 from attrify import Attrify
 
 pytestmark = pytest.mark.asyncio
-print(tracemoepy)
 assert os.path.exists("flipped-good.webp")
 
 async def test_a_intializing():
@@ -29,11 +29,7 @@ async def test_b_search():
 
     result = await tracemoe.search("https://trace.moe/img/flipped-good.jpg", is_url=True)
     assert isinstance(result, Attrify)
-
-    # Don't ask why.
-    # result = await tracemoe.search("flipped-good.webp", upload_file=True)
-    # assert isinstance(result, Attrify)
-
+    await asyncio.sleep(1)
     await tracemoe.aio_session.close()
 
 
@@ -44,12 +40,12 @@ async def test_c_natural_preview():
     content = await tracemoe.natural_preview(result)
 
     assert isinstance(content, bytes)
-
+    await asyncio.sleep(1)
     preview = await result.result[0].save("natural-preview.mp4")
 
     assert preview == True
     assert os.path.exists("natural-preview.mp4") == True
-
+    await asyncio.sleep(1)
     preview = await result.result[0].save("natural-preview-silent.mp4", mute=True)
 
     assert preview == True
@@ -62,13 +58,12 @@ async def test_d_image_preview():
     tracemoe = AsyncTrace()
 
     result = await tracemoe.search("https://trace.moe/img/flipped-good.jpg", is_url=True)
-
     content = await tracemoe.image_preview(result)
 
     assert isinstance(content, bytes)
-
+    await asyncio.sleep(1)
     preview = await result.result[0].save(
-        save_path="image-preview.png", preview_path=IMAGE_PREVIEW
+        save_path="image-preview.png", preview_type="image"
     )
 
     assert preview == True
@@ -82,10 +77,10 @@ async def test_e_errors():
 
     with pytest.raises(ServerError):
         await tracemoe.search("https://example.com")
-
+    await asyncio.sleep(1)
     result = await tracemoe.search("https://trace.moe/img/flipped-good.jpg", is_url=True)
-
+    await asyncio.sleep(1)
     with pytest.raises(InvalidPath):
-        await result.result[0].save("preview.mp4", preview_path="/non-existant-path")
+        await result.result[0].save("preview.mp4", preview_type="/non-existant-type")
 
     await tracemoe.aio_session.close()

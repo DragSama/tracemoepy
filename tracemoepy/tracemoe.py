@@ -16,7 +16,7 @@ except ImportError:
     ujson = False
 
 
-def save(self, save_path: str, preview_path: Optional[str] = None, mute: bool = False):
+def save(self, save_path: str, preview_type: Optional[str] = None, mute: bool = False):
 
     """
     Save preview in given location
@@ -30,15 +30,14 @@ def save(self, save_path: str, preview_path: Optional[str] = None, mute: bool = 
     """
 
     json = self
-    if preview_path:
-        url = (
-            f"{BASE_URL}{preview_path}?anilist_id={json['anilist_id']}"
-            f"&file={quote(json['filename'])}&t={json['at']}&token={json['tokenthumb']}"
-        )
-    else:
+    if not preview_type or preview_type == "video":
         url = json['video']
         if mute:
             url += "&mute"
+    elif preview_type and preview_type == "image":
+        url = json['image']
+    else:
+        raise InvalidPath("'preview_type' can only be 'image' or 'video'")
     response = requests.get(url)
     if response.status_code in [500, 503]:
         raise ServerError("Image is malformed or Something went wrong")

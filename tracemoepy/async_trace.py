@@ -17,28 +17,27 @@ import types
 
 
 async def save(
-    self, save_path: str, preview_path: Optional[str] = None, mute: bool = False
+    self, save_path: str, preview_type: Optional[str] = None, mute: bool = False
 ):
     """
     Save preview in given location
     Args:
         save_path: Path to save preview
-        preview_path: None for natural preview, Otherwise preview.php or thumbnail.php, Defaults to None
+        preview_type: image/video
         mute: Mute natural preview, Defaults to False
     Raises:
         ServerError: Failed to create preview
         InvalidPath: Preview path given doesn't exist on tracemoe servers
     """
     json = self
-    if preview_path:
-        url = (
-            f"{BASE_URL}{preview_path}?anilist_id={json['anilist_id']}"
-            f"&file={quote(json['filename'])}&t={json['at']}&token={json['tokenthumb']}"
-        )
-    else:
+    if not preview_type or preview_type == "video":
         url = json['video']
         if mute:
             url += "&mute"
+    elif preview_type and preview_type == "image":
+        url = json['image']
+    else:
+        raise InvalidPath("'preview_type' can only be 'image' or 'video'")
     response = await self.aio_session.get(url)
     if response.status in [500, 503]:
         raise ServerError("Image is malformed or Something went wrong")
