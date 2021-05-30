@@ -1,6 +1,6 @@
 import os
 import pytest
-
+import tracemoepy
 from tracemoepy import TraceMoe
 from tracemoepy.errors import InvalidToken, ServerError, InvalidPath
 from tracemoepy.helpers.constants import IMAGE_PREVIEW
@@ -8,7 +8,7 @@ from tracemoepy.helpers.constants import IMAGE_PREVIEW
 from attrify import Attrify
 
 tracemoe = TraceMoe()
-
+print(tracemoepy)
 
 def test_search():
     assert os.path.exists("flipped-good.webp")
@@ -18,9 +18,6 @@ def test_search():
 
     result = tracemoe.search("flipped-good.webp", upload_file=True)
     assert isinstance(result, Attrify)
-    # Not testing because tracemoe is having issues with base64 encoded images.
-    # result = tracemoe.search('flipped-good.webp', encode = True)
-    # assert isinstance(result, Attrify)
 
 
 def test_b_natural_preview():
@@ -30,12 +27,12 @@ def test_b_natural_preview():
 
     assert isinstance(content, bytes)
 
-    preview = result.docs[0].save("natural-preview.mp4")
+    preview = result.result[0].save("natural-preview.mp4")
 
     assert preview == True
     assert os.path.exists("natural-preview.mp4") == True
 
-    preview = result.docs[0].save("natural-preview-silent.mp4", mute=True)
+    preview = result.result[0].save("natural-preview-silent.mp4", mute=True)
 
     assert preview == True
     assert os.path.exists("natural-preview-silent.mp4") == True
@@ -48,7 +45,7 @@ def test_c_image_preview():
     content = tracemoe.image_preview(result)
     assert isinstance(content, bytes)
 
-    preview = result.docs[0].save(
+    preview = result.result[0].save(
         save_path="image-preview.png", preview_path=IMAGE_PREVIEW
     )
     assert preview == True
@@ -56,14 +53,6 @@ def test_c_image_preview():
 
 
 def test_d_errors():
-    tracemoe = TraceMoe(api_token="spfskjapofapokfapkf")
-
-    with pytest.raises(InvalidToken):
-        tracemoe.get_me()
-
-    with pytest.raises(InvalidToken):
-        tracemoe.search("https://trace.moe/img/flipped-good.jpg", is_url=True)
-
     tracemoe = TraceMoe()
 
     with pytest.raises(ServerError):

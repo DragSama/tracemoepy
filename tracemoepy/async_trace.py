@@ -36,10 +36,7 @@ async def save(
             f"&file={quote(json['filename'])}&t={json['at']}&token={json['tokenthumb']}"
         )
     else:
-        url = (
-            f'{BASE_MEDIA_URL}video/{json["anilist_id"]}/'
-            f'{quote(json["filename"])}?t={json["at"]}&token={json["tokenthumb"]}'
-        )
+        url = json['video']
         if mute:
             url += "&mute"
     response = await self.aio_session.get(url)
@@ -76,7 +73,7 @@ class AsyncTrace:
         Returns:
           Attrify: response from server
         """
-        url = f"{self.base_url}api/me"
+        url = f"{self.base_url}/me"
         if self.api_token:
             url += f"?token={self.api_token}"
         response = await self.aio_session.get(url)
@@ -87,12 +84,11 @@ class AsyncTrace:
         return Attrify((await response.json()))
 
     async def search(
-        self, path: str, encode: bool = False, upload_file=False, is_url: bool = False
+        self, path: str, upload_file=False, is_url: bool = False
     ) -> Attrify:
         """
         Args:
            path: Image url or Img file name or base64 encoded Image or Image path
-           encode: True if Img file name is given
            is_url: Treat the path as a url or not
            upload_file: Upload file
         Returns:
@@ -103,7 +99,7 @@ class AsyncTrace:
            ServerError: Raised If server Is having problem or Image Is malformed.
            TooManyRequests: Raised when you are making too many requests
         """
-        url = f"{self.base_url}api/search"
+        url = f"{self.base_url}/search"
         if self.api_token:
             url += f"?token={self.api_token}"
 
@@ -114,10 +110,6 @@ class AsyncTrace:
                 response = await self.aio_session.post(
                     url, data={"image": file}
                 )
-        elif encode:
-            with open(path, "rb") as f:
-                encoded = b64encode(f.read()).decode("utf-8")
-                response = await self.aio_session.post(url, json={"image": encoded})
         else:
             response = await self.aio_session.post(url, json={"image": path})
         if response.status == 200:
@@ -125,7 +117,7 @@ class AsyncTrace:
                 json = Attrify((await response.json(loads=ujson.loads)))
             else:
                 json = Attrify((await response.json()))
-            for entry in json.docs:
+            for entry in json.result:
                 entry.aio_session = self.aio_session
                 entry.save = types.MethodType(save, entry)
             return json
@@ -140,71 +132,33 @@ class AsyncTrace:
         else:
             raise ServerError(f"Unknown error: {response.status}")
 
-    async def create_preview(
-        self,
-        json: Union[dict, Attrify],
-        path: str,
-        index: int = 0,
-    ) -> bytes:
-        """
-        Args:
-           json: Python dict given by search
-           index: Which result to get
-           path: Path to use, preview.php, thumbnail.php etc.
-        Returns:
-           bytes: Video/Image content
-        """
-        json = json["docs"][index]
-        url = (
-            f"{self.base_url}{path}?anilist_id={json['anilist_id']}"
-            f"&file={quote(json['filename'])}&t={json['at']}&token={json['tokenthumb']}"
-        )
-        return await (await self.aio_session.get(url)).content.read()
-
-    async def natural_preview(
-        self, response: Union[dict, Attrify], index: int = 0, mute: bool = False
-    ) -> bytes:
-        """
-        Video Preview with Natural Scene Cutting
-        Args:
-            response: server response
-            index: which result to get
-            mute: mute video or not.
-        Returns:
-            bytes: Video content
-        """
-        response = response["docs"][index]
-        url = (
-            f'{self.media_url}video/{response["anilist_id"]}/'
-            f'{quote(response["filename"])}?t={response["at"]}&token={response["tokenthumb"]}'
-        )
-        if mute:
-            url += "&mute"
-        return await (await self.aio_session.get(url)).content.read()
+    async def natural_preview(self, *args, **kwargs) -> bytes:
+        return await self.video_preview(*args, **kwargs)
+        
 
     async def image_preview(
-        self, json: Union[dict, Attrify], index: int = 0
+        self, response: Union[dict, Attrify], index: int = 0
     ) -> bytes:
         """
         Args:
-           json: Python dict given by search
+           response: Response returned by search
            index: Which result to get
         Returns:
-           bytes: Video content
+           bytes: Image content
         """
-        return await self.create_preview(json, IMAGE_PREVIEW, index)
+        return await (await self.aio_session.get(response["result"][index]["image"])).content.read()
 
     async def video_preview(
-        self, json: Union[dict, Attrify], index: int = 0
-    ) -> bytes:
+        self, response: Union[dict, Attrify], index: int = 0, mute: bool=False) -> bytes:
         """
         Args:
-           json: Python dict given by search
+           response: Response returned by search
            index: Which result to get
+           mute: The given video should be mute or not.
         Returns:
            bytes: Video content
         """
-        return await self.create_preview(json, VIDEO_PREVIEW, index)
+        return await (await self.aio_session.get(response["result"][index]["video"] + ("&mute" if mute else ""))).content.read()
     
     async def __aenter__(self):
         return self
