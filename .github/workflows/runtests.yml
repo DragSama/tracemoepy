@@ -6,11 +6,11 @@ on:
   push:
     branches:
     - master
-    - test
+    - migrate
   pull_request:
     branches:
     - master
-    - test
+    - migrate
 
 jobs:
   build:
