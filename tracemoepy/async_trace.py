@@ -106,22 +106,24 @@ class AsyncTrace:
            TooManyRequests: Raised If you make too many requests to server.
         """
         url = f"{self.base_url}/search"
+        params = {}
         if self.api_token:
-            url += f"?key={self.api_token}"
+            params['key']= self.api_token
         if cut_black_borders:
-            url += "&cutBorders"
+            params['cutBorders'] = ""
         if include_anilist_info:
-            url += "&anilistInfo"
+            params['anilistInfo'] = ""
 
         if is_url:
-            response = await self.aio_session.get(url, params={"url": path})
+            params['url'] = path
+            response = await self.aio_session.get(url, params=params)
         elif upload_file:
             with open(path, "rb") as file:
                 response = await self.aio_session.post(
-                    url, data={"image": file}
+                    url, data={"image": file},params=params
                 )
         else:
-            response = await self.aio_session.post(url, json={"image": path})
+            response = await self.aio_session.post(url, json={"image": path}, params=params)
         if response.status == 200:
             if ujson:
                 json = Attrify((await response.json(loads=ujson.loads)))
@@ -140,7 +142,7 @@ class AsyncTrace:
         elif response.status == 429:
             raise TooManyRequests(response.text)
         else:
-            raise ServerError(f"Unknown error: {response.status}")
+            raise ServerError(f"Unknown error: {response.status}, {response.url}")
 
     async def natural_preview(self, *args, **kwargs) -> bytes:
         return await self.video_preview(*args, **kwargs)

@@ -97,19 +97,21 @@ class TraceMoe:
            TooManyRequests: Raised If you make too many requests to server.
         """
         url = f"{self.base_url}/search"
+        params = {}
         if self.api_token:
-            url += f"?key={self.api_token}"
+            params['key']= self.api_token
         if cut_black_borders:
-            url += "&cutBorders"
+            params['cutBorders'] = ""
         if include_anilist_info:
-            url += "&anilistInfo"
+            params['anilistInfo'] = ""
         if is_url:
-            response = requests.get(url, params={"url": path})
+            params['url'] = path
+            response = requests.get(url, params=params)
         elif upload_file:
             with open(path, "rb") as f:
-                response = requests.post(url, files={"image": f})
+                response = requests.post(url, files={"image": f}, params=params)
         else:
-            response = requests.post(url, json={"image": path})
+            response = requests.post(url, json={"image": path}, params=params)
         if response.status_code == 200:
             if ujson:
                 json = Attrify(ujson.loads(response.text))
