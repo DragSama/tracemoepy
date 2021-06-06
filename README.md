@@ -17,9 +17,9 @@ tracemoe = tracemoepy.tracemoe.TraceMoe()
 
 - Search image using url:
 ```python
-result = tracemoe.search('https://trace.moe/img/flipped-good.jpg', is_url = True)
-print(result.prettify())
-print(f"Match: {resp.result[0].anime}\nSimilarity: {resp.result[0].similarity*100}")
+resp = tracemoe.search('https://trace.moe/img/flipped-good.jpg', is_url = True)
+print(resp.prettify())
+print(f"Match: {resp.result[0].anilist.title.romaji}\nSimilarity: {resp.result[0].similarity*100}")
 ```
 
 - Or just file path:
@@ -60,7 +60,7 @@ help(tracemoe.search)
 import tracemoepy
 tracemoe = tracemoepy.AsyncTrace()
 resp = await tracemoe.search('https://trace.moe/img/flipped-good.jpg', is_url = True)
-print(f"Match: {resp.result[0].anime}\nSimilarity: {resp.result[0].similarity*100}")
+print(f"Match: {resp.result[0].anilist.title.romaji}\nSimilarity: {resp.result[0].similarity*100}")
 ```   
 
 - Auto close session
@@ -68,7 +68,7 @@ print(f"Match: {resp.result[0].anime}\nSimilarity: {resp.result[0].similarity*10
 import tracemoepy
 async with tracemoepy.AsyncTrace() as tracemoe:
   resp = await tracemoe.search('https://trace.moe/img/flipped-good.jpg', is_url = True)
-  print(f"Match: {resp.result[0].anime}\nSimilarity: {resp.result[0].similarity*100}")
+  print(f"Match: {resp.result[0].anilist.title.romaji}\nSimilarity: {resp.result[0].similarity*100}")
 
 ```
 #### Errors
