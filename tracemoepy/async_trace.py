@@ -74,7 +74,7 @@ class AsyncTrace:
         """
         url = f"{self.base_url}/me"
         if self.api_token:
-            url += f"?token={self.api_token}"
+            url += f"?key={self.api_token}"
         response = await self.aio_session.get(url)
         if response.status == 403:
             raise InvalidToken("You are using Invalid token!")
@@ -83,24 +83,35 @@ class AsyncTrace:
         return Attrify((await response.json()))
 
     async def search(
-        self, path: str, upload_file=False, is_url: bool = False
+        self,
+        path: str,
+        is_url: bool = False,
+        upload_file: bool = False,
+        cut_black_borders: bool = True,
+        include_anilist_info: bool = True
     ) -> Attrify:
         """
         Args:
-           path: Image url or Img file name or base64 encoded Image or Image path
-           is_url: Treat the path as a url or not
-           upload_file: Upload file
+           path: Image url or Img file name or base64 encoded Image or Image path.
+           is_url: Treat the path as a url or not.
+           upload_file: Self explanatory.
+           cut_black_borders: trace.moe can detect black borders automatically and cut away unnecessary parts of the images that would affect search results accuracy.
+           include_anilist_info: Additional info about anime.
         Returns:
            Attrify: response from server
         Raises:
            EmptyImage: Raised If Image Is empty
            InvalidToken: Raised when token provided Is Invalid
            ServerError: Raised If server Is having problem or Image Is malformed.
-           TooManyRequests: Raised when you are making too many requests
+           TooManyRequests: Raised If you make too many requests to server.
         """
         url = f"{self.base_url}/search"
         if self.api_token:
-            url += f"?token={self.api_token}"
+            url += f"?key={self.api_token}"
+        if cut_black_borders:
+            url += "&cutBorders"
+        if include_anilist_info:
+            url += "&anilistInfo"
 
         if is_url:
             response = await self.aio_session.get(url, params={"url": path})
