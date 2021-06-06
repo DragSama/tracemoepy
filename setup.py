@@ -10,7 +10,6 @@ with open("tracemoepy/__init__.py", "r") as f:
 
 setuptools.setup(
     name="tracemoepy",
-    packagaes=["tracemoepy"],
     version=version,
     description="Trace.moe python wrapper",
     long_description=long_description,
