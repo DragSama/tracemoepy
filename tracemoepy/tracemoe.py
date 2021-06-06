@@ -16,7 +16,7 @@ except ImportError:
     ujson = False
 
 
-def save(self, save_path: str, preview_path: Optional[str] = None, mute: bool = False):
+def save(self, save_path: str, preview_type: Optional[str] = None, mute: bool = False):
 
     """
     Save preview in given location
@@ -30,18 +30,14 @@ def save(self, save_path: str, preview_path: Optional[str] = None, mute: bool = 
     """
 
     json = self
-    if preview_path:
-        url = (
-            f"{BASE_URL}{preview_path}?anilist_id={json['anilist_id']}"
-            f"&file={quote(json['filename'])}&t={json['at']}&token={json['tokenthumb']}"
-        )
-    else:
-        url = (
-            f'{BASE_MEDIA_URL}video/{json["anilist_id"]}/'
-            f'{quote(json["filename"])}?t={json["at"]}&token={json["tokenthumb"]}'
-        )
+    if not preview_type or preview_type == "video":
+        url = json['video']
         if mute:
             url += "&mute"
+    elif preview_type and preview_type == "image":
+        url = json['image']
+    else:
+        raise InvalidPath("'preview_type' can only be 'image' or 'video'")
     response = requests.get(url)
     if response.status_code in [500, 503]:
         raise ServerError("Image is malformed or Something went wrong")
@@ -67,9 +63,9 @@ class TraceMoe:
         Returns:
           Attrify: response from server
         """
-        url = f"{self.base_url}api/me"
+        url = f"{self.base_url}/me"
         if self.api_token:
-            url += f"?token={self.api_token}"
+            url += f"?key={self.api_token}"
         response = requests.get(url)
         if response.status_code == 403:
             raise InvalidToken("You are using Invalid token!")
@@ -80,16 +76,18 @@ class TraceMoe:
     def search(
         self,
         path: str,
-        encode: bool = False,
         is_url: bool = False,
         upload_file: bool = False,
+        cut_black_borders: bool = True,
+        include_anilist_info: bool = True
     ) -> Attrify:
         """
         Args:
-           path: Image url or Img file name or base64 encoded Image or Image path
-           encode: True if Img file name is given
-           is_url: Treat the path as a url or not
-           upload_file: Upload file
+           path: Image url or Img file name or base64 encoded Image or Image path.
+           is_url: Treat the path as a url or not.
+           upload_file: Self explanatory.
+           cut_black_borders: trace.moe can detect black borders automatically and cut away unnecessary parts of the images that would affect search results accuracy.
+           include_anilist_info: Additional info about anime.
         Returns:
            Attrify: response from server
         Raises:
@@ -98,27 +96,28 @@ class TraceMoe:
            ServerError: Raised If server Is having problem or Image Is malformed.
            TooManyRequests: Raised If you make too many requests to server.
         """
-        url = f"{self.base_url}api/search"
+        url = f"{self.base_url}/search"
+        params = {}
         if self.api_token:
-            url += f"?token={self.api_token}"
-
+            params['key']= self.api_token
+        if cut_black_borders:
+            params['cutBorders'] = ""
+        if include_anilist_info:
+            params['anilistInfo'] = ""
         if is_url:
-            response = requests.get(url, params={"url": path})
+            params['url'] = path
+            response = requests.get(url, params=params)
         elif upload_file:
             with open(path, "rb") as f:
-                response = requests.post(url, files={"image": f})
-        elif encode:
-            with open(path, "rb") as f:
-                encoded = b64encode(f.read()).decode("utf-8")
-                response = requests.post(url, json={"image": encoded})
+                response = requests.post(url, files={"image": f}, params=params)
         else:
-            response = requests.post(url, json={"image": path})
+            response = requests.post(url, json={"image": path}, params=params)
         if response.status_code == 200:
             if ujson:
                 json = Attrify(ujson.loads(response.text))
             else:
                 json = Attrify(response.json())
-            for entry in json.docs:
+            for entry in json.result:
                 entry.save = types.MethodType(save, entry)
             return json
         elif response.status_code == 400:
@@ -132,69 +131,29 @@ class TraceMoe:
         else:
             raise ServerError(f"Unknown error: {response.status_code}")
 
-    def create_preview(
-        self, json: Union[dict, Attrify], path: str, index: int = 0
-    ) -> bytes:
+    def image_preview(self, response: Union[dict, Attrify], index: int = 0) -> bytes:
         """
         Args:
-           json: Python dict given by search
+           response: Response returned by search
            index: Which result to get
-           path: Path to use, preview.php, thumbnail.php etc.
         Returns:
-           bytes: Video/Image content
+           bytes: Image content
         """
-        json = json["docs"][index]
-        url = (
-            f"{self.base_url}{path}?anilist_id={json['anilist_id']}"
-            f"&file={quote(json['filename'])}&t={json['at']}&token={json['tokenthumb']}"
-        )
-        response = requests.get(url)
-        if response.status_code in [500, 503]:
-            raise ServerError("Image is malformed or Something went wrong")
-        else:
-            return response.content
+        return requests.get(response["result"][index]["image"]).content
 
-    def image_preview(self, json: Union[dict, Attrify], index: int = 0) -> bytes:
+    def video_preview(self, response: Union[dict, Attrify], index: int = 0, mute: bool = False) -> bytes:
         """
         Args:
-           json: Python dict given by search
+           response: Python dict given by search
            index: Which result to get
+           mute: The given video should be mute or not.
         Returns:
            bytes: Video content
         """
-        return self.create_preview(json, IMAGE_PREVIEW, index)
+        return requests.get(response["result"][index]["video"] + ("&mute" if mute else "")).content
 
-    def video_preview(self, json: Union[dict, Attrify], index: int = 0) -> bytes:
+    def natural_preview(self, *args, **kwargs) -> bytes:
         """
-        Args:
-           json: Python dict given by search
-           index: Which result to get
-        Returns:
-           bytes: Video content
+         Same as tracemoe.video_preview since v4.
         """
-        return self.create_preview(json, VIDEO_PREVIEW, index)
-
-    def natural_preview(
-        self, response: Union[dict, Attrify], index: int = 0, mute: bool = False
-    ) -> bytes:
-        """
-        Video Preview with Natural Scene Cutting
-        Args:
-            response: server response
-            index: which result to pick
-            mute: mute video or not.
-        Returns:
-            bytes: Video content
-        """
-        response = response["docs"][index]
-        url = (
-            f'{self.media_url}video/{response["anilist_id"]}/'
-            f'{quote(response["filename"])}?t={response["at"]}&token={response["tokenthumb"]}'
-        )
-        if mute:
-            url += "&mute"
-        response = requests.get(url)
-        if response.status_code in [500, 503]:
-            raise ServerError("Image is malformed or Something went wrong")
-        else:
-            return response.content
+        return self.video_preview(*args, **kwargs)
